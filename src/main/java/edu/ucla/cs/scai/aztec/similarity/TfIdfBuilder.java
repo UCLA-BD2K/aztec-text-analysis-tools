@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
-import edu.ucla.cs.scai.aztec.EntryLoader;
+import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -168,8 +163,10 @@ public class TfIdfBuilder {
     }
 
     public static void main(String[] args) throws Exception {
-        ArrayList<AztecEntry> entries = new EntryLoader("/home/massimo/Downloads/solrResources.json").load();
+        String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
+        String tfidtPath = System.getProperty("tfidt.path","/home/massimo/aztec/tdidf.data");
+        ArrayList<AztecEntry> entries = new AztecEntryProviderFromJsonFile(entriesPath).load();
         TfIdfBuilder builder = new TfIdfBuilder();
-        builder.buildTfIdfMatrix(entries, "/home/massimo/aztec/tdidf.data");
+        builder.buildTfIdfMatrix(entries, tfidtPath);
     }
 }

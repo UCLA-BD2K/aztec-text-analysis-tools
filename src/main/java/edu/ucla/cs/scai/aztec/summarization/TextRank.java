@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.summarization;
 
 import edu.ucla.cs.scai.aztec.similarity.Tokenizer;
@@ -111,9 +106,30 @@ public class TextRank {
         }
         Arrays.sort(ordered, new RankComparator(rank));
     }
+    
+    //returns the sentences with a rank at least equal to 0.9 times the maximum rank
+    public List<String> topSentences() {
+        ArrayList<Integer> ids=new ArrayList<>();
+        double minRank=rank[ordered[0]]*0.9;
+        int i=0;
+        while (i<ordered.length && rank[ordered[i]]>=minRank) {
+            ids.add(ordered[i]);
+            i++;
+        }
+        Collections.sort(ids);        
+        LinkedList<String> res = new LinkedList<>();
+        for (int k:ids) {
+            res.add(sentences.get(k));
+        }
+        return res;
+    }
+    
 
     //returns the sentences with the top-k rank, in the order in which they appear in the text
-    public List<String> topSentences(int k) {
+    public List<String> topSentences(Integer k) {
+        if (k==null) {
+            return topSentences();
+        }
         if (k > sentences.size()) {
             k = sentences.size();
         }        

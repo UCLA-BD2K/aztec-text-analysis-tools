@@ -1,20 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec;
 
 /**
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
-public class PossibleDuplicate {
+public class PossibleDuplicates {
 
     AztecEntry e1, e2;
     String reason;
 
-    public PossibleDuplicate(AztecEntry e1, AztecEntry e2, String reason) {
+    public PossibleDuplicates(AztecEntry e1, AztecEntry e2, String reason) {
         this.e1 = e1;
         this.e2 = e2;
         this.reason = reason;
