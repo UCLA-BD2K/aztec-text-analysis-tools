@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.grants;
 
 import com.google.gson.JsonElement;
@@ -40,7 +35,8 @@ public class AckLoader {
     }
 
     public static void main(String[] args) throws Exception {
-        ArrayList<String> acks = new AckLoader().loadAcks("/home/massimo/Downloads/solrPublicationExtracts.json");
+        String solrPublicationExtracts=System.getProperty("publications.path", "/home/massimo/Downloads/solrPublicationExtracts.json");
+        ArrayList<String> acks = new AckLoader().loadAcks(solrPublicationExtracts);
         int i = 1;
         Tokenizer tokenizer = new Tokenizer();
         GrantExtractor extractor = new GrantExtractor(new MockGrantSentenceClassifier());

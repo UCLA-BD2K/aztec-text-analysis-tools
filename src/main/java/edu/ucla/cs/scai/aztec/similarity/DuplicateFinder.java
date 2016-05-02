@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
-import edu.ucla.cs.scai.aztec.EntryLoader;
-import edu.ucla.cs.scai.aztec.PossibleDuplicate;
+import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
+import edu.ucla.cs.scai.aztec.PossibleDuplicates;
 import edu.ucla.cs.scai.aztec.utils.ImageUtils;
 import edu.ucla.cs.scai.aztec.utils.StringUtils;
 import java.util.ArrayList;
@@ -122,20 +117,20 @@ public class DuplicateFinder {
         return find(CachedData.entryMap.get(entryId));
     }
 
-    public ArrayList<PossibleDuplicate> findAll() {
-        ArrayList<PossibleDuplicate> res = new ArrayList<>();
+    public ArrayList<PossibleDuplicates> findAll() {
+        ArrayList<PossibleDuplicates> res = new ArrayList<>();
         for (int i = 0; i < CachedData.entryArray.size() - 1; i++) {
             AztecEntry e1 = CachedData.entryArray.get(i);
             for (int j = i + 1; j < CachedData.entryArray.size(); j++) {
                 AztecEntry e2 = CachedData.entryArray.get(j);
                 if (duplicatesForName(e1, e2)) {
-                    PossibleDuplicate pd = new PossibleDuplicate(e1, e2, "Name");
+                    PossibleDuplicates pd = new PossibleDuplicates(e1, e2, "Name");
                     res.add(pd);
                     System.out.println(pd);
                     //} else if (duplicatesForLogo(e1, e2)) {
-                    //res.add(new PossibleDuplicate(e1, e2, "Their logo is very similar"));
+                    //res.add(new PossibleDuplicates(e1, e2, "Their logo is very similar"));
                 } else if (duplicatesForSourceCodeUrl(e1, e2)) {
-                    PossibleDuplicate pd = new PossibleDuplicate(e1, e2, "Source code url");
+                    PossibleDuplicates pd = new PossibleDuplicates(e1, e2, "Source code url");
                     res.add(pd);
                     System.out.println(pd + " " + e1.getSourceCodeURL() + " " + e2.getSourceCodeURL());
                 }
@@ -145,15 +140,16 @@ public class DuplicateFinder {
     }
 
     public static void main(String[] args) throws Exception {
-        ArrayList<AztecEntry> entries = new EntryLoader("/home/massimo/Downloads/solrResources.json").load();
+        String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
+        ArrayList<AztecEntry> entries = new AztecEntryProviderFromJsonFile(entriesPath).load();
         HashMap<String, AztecEntry> entryById = new HashMap<>();
         for (AztecEntry e : entries) {
             entryById.put(e.getId(), e);
         }
-        ArrayList<PossibleDuplicate> possibileDuplicates = new DuplicateFinder().findAll();
+        ArrayList<PossibleDuplicates> possibileDuplicates = new DuplicateFinder().findAll();
         System.out.println(possibileDuplicates.size() + " possibile duplicate pairs");
         HashMap<String, ArrayList<String>> edges = new HashMap<>();
-        for (PossibleDuplicate pd : possibileDuplicates) {
+        for (PossibleDuplicates pd : possibileDuplicates) {
             String id1 = pd.getE1().getId();
             String id2 = pd.getE2().getId();
             ArrayList<String> l1 = edges.get(id1);

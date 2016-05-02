@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.grants;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -10,7 +5,6 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
-import edu.ucla.cs.scai.aztec.similarity.RepresentativeProvider;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +26,7 @@ public class Tokenizer {
     private final static HashSet<String> stopwords = new HashSet<>();
 
     static {
+        //TODO: compare with Glasgow stop word list: http://ir.dcs.gla.ac.uk/resources/linguistic_utils/stop_words
         String s = "a\n"
                 + "about\n"
                 + "above\n"

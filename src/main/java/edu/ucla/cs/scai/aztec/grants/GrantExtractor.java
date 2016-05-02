@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.grants;
 
 import java.io.FileNotFoundException;
@@ -20,11 +15,33 @@ import net.sf.extjwnl.JWNLException;
 public class GrantExtractor {
 
     GrantSentenceClassifier classifier;
+    Tokenizer tokenizer;
 
     public GrantExtractor(GrantSentenceClassifier classifier) {
         this.classifier = classifier;
+        try {
+            tokenizer = new Tokenizer();
+        } catch (JWNLException ex) {
+            Logger.getLogger(GrantExtractor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GrantExtractor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
+    public GrantExtractor(GrantSentenceClassifier classifier, Tokenizer tokenizer) {
+        this.classifier = classifier;
+        this.tokenizer = tokenizer;
+    }
+
+    public LinkedList<String> extractGrants(String text) {
+        LinkedList<LinkedList<ExtendedToken>> tokenLists = tokenizer.tokenize(text);
+        LinkedList<String> res = new LinkedList<>();
+        for (LinkedList<ExtendedToken> tokens : tokenLists) {
+            res.addAll(extractGrants(tokens));
+        }
+        return res;
+    }
+
     public LinkedList<String> extractGrants(List<ExtendedToken> tokens) {
         LinkedList<String> candidates = new LinkedList<>();
         Iterator<ExtendedToken> it = tokens.iterator();
@@ -43,13 +60,22 @@ public class GrantExtractor {
                 candidates.add(candidate);
             }
         }
-        if (!candidates.isEmpty() && classifier.containsGrant(tokens)>0.5) {
+        if (!candidates.isEmpty() && classifier.containsGrant(tokens) > 0.5) {
             return candidates;
         } else {
             return new LinkedList<>();
         }
     }
-    
+
+    public LinkedList<String> extractAgency(String text) {
+        LinkedList<LinkedList<ExtendedToken>> tokenLists = tokenizer.tokenize(text);
+        LinkedList<String> res = new LinkedList<>();
+        for (LinkedList<ExtendedToken> tokens : tokenLists) {
+            res.addAll(extractAgency(tokens));
+        }
+        return res;
+    }
+
     public LinkedList<String> extractAgency(List<ExtendedToken> tokens) {
         LinkedList<String> candidates = new LinkedList<>();
         Iterator<ExtendedToken> it = tokens.iterator();
@@ -68,7 +94,7 @@ public class GrantExtractor {
                 candidates.add(candidate);
             }
         }
-        if (!candidates.isEmpty() && classifier.containsGrant(tokens)>0.5) {
+        if (!candidates.isEmpty() && classifier.containsGrant(tokens) > 0.5) {
             return candidates;
         } else {
             return new LinkedList<>();

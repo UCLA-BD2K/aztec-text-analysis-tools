@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -10,7 +5,6 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
-import edu.ucla.cs.scai.aztec.similarity.RepresentativeProvider;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -217,7 +211,9 @@ public class Tokenizer {
         //Properties propsTree = new Properties();
         //propsTree.put("annotators", "tokenize, ssplit, parse");
         //pipelineTree = new StanfordCoreNLP(propsTree);
-        representativeProvider = new RepresentativeProvider("/home/massimo/aztec/representatives.data", "/home/massimo/wordnet/properties.xml");
+        String wordnetPath = System.getProperty("wordnet.path", "/home/massimo/wordnet/properties.xml");
+        String representativesPath = System.getProperty("representativeWords.path", "/home/massimo/aztec/representatives.data");
+        representativeProvider = new RepresentativeProvider(representativesPath, wordnetPath);
     }
     
     public LinkedList<String> tokenize(String text) {

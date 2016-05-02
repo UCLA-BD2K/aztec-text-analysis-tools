@@ -1,13 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.TypeAdapters;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -16,14 +10,15 @@ import java.util.ArrayList;
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
-public class EntryLoader {
+public class AztecEntryProviderFromJsonFile implements AztecEntryProvider {
 
     String fileName;
 
-    public EntryLoader(String fileName) {
+    public AztecEntryProviderFromJsonFile(String fileName) {
         this.fileName = fileName;
     }
 
+    @Override
     public ArrayList<AztecEntry> load() throws Exception {
         StringBuilder json = new StringBuilder();
         try (BufferedReader in = new BufferedReader(new FileReader(fileName))) {
@@ -39,7 +34,8 @@ public class EntryLoader {
     }
 
     public static void main(String[] args) throws Exception {
-        ArrayList<AztecEntry> entries=new EntryLoader("/home/massimo/Downloads/solrResources.json").load();
+        String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
+        ArrayList<AztecEntry> entries=new AztecEntryProviderFromJsonFile(entriesPath).load();
         System.out.println(entries.size());
     }
 

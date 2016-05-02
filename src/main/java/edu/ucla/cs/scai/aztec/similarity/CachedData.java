@@ -1,12 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
-import edu.ucla.cs.scai.aztec.EntryLoader;
+import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,10 +24,7 @@ public class CachedData {
 
     static {
 
-        String tfidtPath = System.getProperty("tfidt.path");
-        if (tfidtPath == null) {
-            tfidtPath = "/home/massimo/aztec/tdidf.data";
-        }
+        String tfidtPath = System.getProperty("tfidt.path","/home/massimo/aztec/tfidf.data");
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath))) {
             documentLength = (HashMap<String, Double>) ois.readObject();
             tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
@@ -41,12 +33,9 @@ public class CachedData {
             Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String entriesPath = System.getProperty("entries.path");
-        if (entriesPath == null) {
-            entriesPath = "/home/massimo/Downloads/solrResources.json";
-        }
+        String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
         try {
-            entryArray = new EntryLoader(entriesPath).load();
+            entryArray = new AztecEntryProviderFromJsonFile(entriesPath).load();
             entryMap = new HashMap<>();
             for (AztecEntry e : entryArray) {
                 entryMap.put(e.getId(), e);
