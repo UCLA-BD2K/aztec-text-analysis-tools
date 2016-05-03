@@ -24,7 +24,7 @@ public class CachedData {
 
     static {
         System.out.println("TF/IDF path system property: "+System.getProperty("tfidt.path"));
-        String tfidtPath = System.getProperty("tfidt.path","/home/massimo/aztec/tfidf.data");
+        String tfidtPath = System.getProperty("tfidf.path","/home/massimo/aztec/tfidf.data");
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath))) {
             documentLength = (HashMap<String, Double>) ois.readObject();
             tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
