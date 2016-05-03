@@ -34,6 +34,7 @@ public class AztecEntryProviderFromJsonFile implements AztecEntryProvider {
     }
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Entries path system property: "+System.getProperty("entries.path"));
         String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
         ArrayList<AztecEntry> entries=new AztecEntryProviderFromJsonFile(entriesPath).load();
         System.out.println(entries.size());

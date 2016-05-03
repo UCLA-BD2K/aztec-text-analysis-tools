@@ -35,6 +35,7 @@ public class AckLoader {
     }
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Publication extracts path system property: "+System.getProperty("publications.path"));
         String solrPublicationExtracts=System.getProperty("publications.path", "/home/massimo/Downloads/solrPublicationExtracts.json");
         ArrayList<String> acks = new AckLoader().loadAcks(solrPublicationExtracts);
         int i = 1;
