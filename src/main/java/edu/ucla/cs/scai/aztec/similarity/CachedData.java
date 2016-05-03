@@ -23,7 +23,7 @@ public class CachedData {
     static ArrayList<AztecEntry> entryArray;
 
     static {
-
+        System.out.println("TF/IDF path system property: "+System.getProperty("tfidt.path"));
         String tfidtPath = System.getProperty("tfidt.path","/home/massimo/aztec/tfidf.data");
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath))) {
             documentLength = (HashMap<String, Double>) ois.readObject();
@@ -32,7 +32,7 @@ public class CachedData {
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        System.out.println("Entries path system property: "+System.getProperty("entries.path"));
         String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
         try {
             entryArray = new AztecEntryProviderFromJsonFile(entriesPath).load();
