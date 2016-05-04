@@ -1,11 +1,14 @@
 package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
+import edu.ucla.cs.scai.aztec.summarization.RankedString;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -118,13 +121,65 @@ public class SimilarityComputation {
         }
         return resk;
     }
+    
+    public double getKeywordDistance(Collection<RankedString> l1, Collection<RankedString> l2) {
+        HashMap<String, Double> w1=new HashMap<>();
+        HashMap<String, Double> w2=new HashMap<>();
+        double totW1=0;
+        for (RankedString s:l1) {
+            w1.put(s.getString(), s.getRank());
+            totW1+=s.getRank();
+        }
+        double totW2=0;
+        for (RankedString s:l2) {
+            w2.put(s.getString(), s.getRank());
+            totW2+=s.getRank();
+        }
+        double intersectionW=0;
+        for (String s:w1.keySet()) {
+            if (w2.containsKey(s)) {
+                intersectionW=w1.get(s)/totW1 + w2.get(s)/totW2;
+            }
+        }
+        return intersectionW/2;
+    }
+    
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywords(String entryId, int k) {
+        return getMostSimilarEntriesWithOnlyKeywords(CachedData.entryMap.get(entryId), k);
+    }
+    
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywords(AztecEntry e, int k) {
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        List<RankedString> l1=CachedData.keywords.get(e.getId());
+        for (String entry : CachedData.keywords.keySet()) {
+            if (entry.equals(e.getId())) {
+                continue;
+            }
+            double simTags = getKeywordDistance(l1, CachedData.keywords.get(entry));
+            res.add(new WeightedEntry(CachedData.entryMap.get(entry), simTags));
+        }
+
+        Collections.sort(res);
+        ArrayList<WeightedEntry> resk = new ArrayList<>();
+        for (WeightedEntry we : res) {
+            if (we.entry.getId().equals(e.getId())) {
+                continue;
+            }
+            if (resk.size() == k) {
+                break;
+            }
+            resk.add(we);
+        }
+        return resk;
+    }
+    
 
     public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyDescription(AztecEntry e, int k) {
         ArrayList<WeightedEntry> res = new ArrayList<>();
         String desc = e.getDescription();
         if (desc != null) {
             LinkedList<String> tokens = tokenizer.tokenize(desc);
-            HashMap<String, Integer> wordCount = new HashMap<>();
+            HashMap<String, Integer> wordCount = new HashMap<>();CachedData.keywords.get(e.getId());
             int max = 1;
             for (String w : tokens) {
                 Integer c = wordCount.get(w);
