@@ -26,7 +26,7 @@ public class CachedData {
     static HashMap<String, List<RankedString>> keywords;
 
     private static void loadTfidfData() throws Exception {
-        System.out.println("TF/IDF path system property: " + System.getProperty("tfidt.path"));
+        System.out.println("TF/IDF path system property: " + System.getProperty("tfidf.path"));
         String tfidtPath = System.getProperty("tfidf.path", "/home/massimo/aztec/tfidf.data");
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath));
         documentLength = (HashMap<String, Double>) ois.readObject();
@@ -35,7 +35,7 @@ public class CachedData {
     }
 
     private static void buildTfidfData() throws Exception {
-        System.out.println("TF/IDF path system property: " + System.getProperty("tfidt.path"));
+        System.out.println("TF/IDF path system property: " + System.getProperty("tfidf.path"));
         String tfidtPath = System.getProperty("tfidf.path", "/home/massimo/aztec/tfidf.data");
         TfIdfBuilder builder = new TfIdfBuilder();
         builder.buildTfIdfMatrix(entryArray, tfidtPath);
