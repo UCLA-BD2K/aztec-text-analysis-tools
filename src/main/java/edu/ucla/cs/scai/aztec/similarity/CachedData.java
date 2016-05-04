@@ -2,11 +2,13 @@ package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
+import edu.ucla.cs.scai.aztec.summarization.KeywordsBuilder;
+import edu.ucla.cs.scai.aztec.summarization.RankedString;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,18 +23,40 @@ public class CachedData {
     static HashMap<String, Double> idf;
     static HashMap<String, AztecEntry> entryMap;
     static ArrayList<AztecEntry> entryArray;
+    static HashMap<String, List<RankedString>> keywords;
+
+    private static void loadTfidfData() throws Exception {
+        System.out.println("TF/IDF path system property: " + System.getProperty("tfidt.path"));
+        String tfidtPath = System.getProperty("tfidf.path", "/home/massimo/aztec/tfidf.data");
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath));
+        documentLength = (HashMap<String, Double>) ois.readObject();
+        tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
+        idf = (HashMap<String, Double>) ois.readObject();
+    }
+
+    private static void buildTfidfData() throws Exception {
+        System.out.println("TF/IDF path system property: " + System.getProperty("tfidt.path"));
+        String tfidtPath = System.getProperty("tfidf.path", "/home/massimo/aztec/tfidf.data");
+        TfIdfBuilder builder = new TfIdfBuilder();
+        builder.buildTfIdfMatrix(entryArray, tfidtPath);
+    }
+    
+    private static void loadKeywords() throws Exception {
+        System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
+        String keywordsPath = System.getProperty("keywords.path", "/home/massimo/aztec/keywords.data");
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(keywordsPath));
+        keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+    }
+
+    private static void buildKeywords() throws Exception {
+        System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
+        String keywordsPath = System.getProperty("keywords.path", "/home/massimo/aztec/keywords.data");
+        KeywordsBuilder builder = new KeywordsBuilder();
+        keywords = builder.buildKeywords(entryArray, keywordsPath);
+    }    
 
     static {
-        System.out.println("TF/IDF path system property: "+System.getProperty("tfidt.path"));
-        String tfidtPath = System.getProperty("tfidf.path","/home/massimo/aztec/tfidf.data");
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath))) {
-            documentLength = (HashMap<String, Double>) ois.readObject();
-            tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
-            idf = (HashMap<String, Double>) ois.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println("Entries path system property: "+System.getProperty("entries.path"));
+        System.out.println("Entries path system property: " + System.getProperty("entries.path"));
         String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
         try {
             entryArray = new AztecEntryProviderFromJsonFile(entriesPath).load();
@@ -44,13 +68,37 @@ public class CachedData {
             Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        try {
+            loadTfidfData();
+        } catch (Exception ex) {
+            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
+            //tfidf data failed, try to reconstruct it
+            try {
+                buildTfidfData();
+                loadTfidfData();
+            } catch (Exception ex2) {
+                Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
+            }
+        }
+        
+        try {
+            loadKeywords();
+        } catch (Exception ex) {
+            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
+            //tfidf data failed, try to reconstruct it
+            try {
+                buildKeywords();
+            } catch (Exception ex2) {
+                Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
+            }
+        }        
     }
 
     static HashMap<String, Double> getDocumentLength() {
         return documentLength;
     }
 
-    static HashMap<String, HashMap<String, Double>> getTfidt() {
+    static HashMap<String, HashMap<String, Double>> getTfIdt() {
         return tfidt;
     }
 

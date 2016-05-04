@@ -94,6 +94,117 @@ public class SimilarityComputation {
         return res;
     }
 
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithSeparateTags(String entryId, int k) {
+        return getMostSimilarEntriesWithSeparateTags(CachedData.entryMap.get(entryId), k);
+    }
+
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyTags(AztecEntry e, int k) {
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        for (String entry : CachedData.tfidt.keySet()) {
+            double simTags = getTagDistance(CachedData.entryMap.get(entry), e);
+            res.add(new WeightedEntry(CachedData.entryMap.get(entry), simTags));
+        }
+
+        Collections.sort(res);
+        ArrayList<WeightedEntry> resk = new ArrayList<>();
+        for (WeightedEntry we : res) {
+            if (we.entry.getId().equals(e.getId())) {
+                continue;
+            }
+            if (resk.size() == k) {
+                break;
+            }
+            resk.add(we);
+        }
+        return resk;
+    }
+
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyDescription(AztecEntry e, int k) {
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        String desc = e.getDescription();
+        if (desc != null) {
+            LinkedList<String> tokens = tokenizer.tokenize(desc);
+            HashMap<String, Integer> wordCount = new HashMap<>();
+            int max = 1;
+            for (String w : tokens) {
+                Integer c = wordCount.get(w);
+                if (c == null) {
+                    wordCount.put(w, 1);
+                } else {
+                    wordCount.put(w, c + 1);
+                    max = Math.max(max, c + 1);
+                }
+            }
+            HashMap<String, Double> queryTfidt = new HashMap<>();
+            double queryLength = 0;
+            for (String w : wordCount.keySet()) {
+                Double val = CachedData.idf.get(w);
+                if (val != null) {
+                    val *= 0.5 + 0.5 * wordCount.get(w) / max;
+                    queryLength += val * val;
+                    queryTfidt.put(w, val);
+                }
+            }
+            queryLength = Math.sqrt(queryLength);
+
+            for (String entry : CachedData.tfidt.keySet()) {
+                double docLength = CachedData.documentLength.get(entry);
+                HashMap<String, Double> row = CachedData.tfidt.get(entry);
+                double product = 0;
+                for (String w : wordCount.keySet()) {
+                    Double val = row.get(w);
+                    if (val != null) {
+                        product += val * queryTfidt.get(w);
+                    }
+                }
+                double simDesc = product / (queryLength * docLength);
+                if (Double.isFinite(simDesc)) {
+                    res.add(new WeightedEntry(CachedData.entryMap.get(entry), simDesc));
+                }
+            }
+        } else {
+            return getMostSimilarEntriesWithOnlyTags(e, k);
+        }
+
+        Collections.sort(res);
+        ArrayList<WeightedEntry> resk = new ArrayList<>();
+        for (WeightedEntry we : res) {
+            if (we.entry.getId().equals(e.getId())) {
+                continue;
+            }
+            if (resk.size() == k) {
+                break;
+            }
+            resk.add(we);
+        }
+        return resk;
+    }
+
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithSeparateTags(AztecEntry e, int k) {
+        ArrayList<WeightedEntry> res1 = getMostSimilarEntriesWithOnlyDescription(e, k);
+        ArrayList<WeightedEntry> res2 = getMostSimilarEntriesWithOnlyTags(e, k);
+        ArrayList<WeightedEntry> resk = new ArrayList<>();
+        int i = 0;
+        int j = 0;
+        HashSet<String> ids = new HashSet<>();
+        while (resk.size() < k && (i < res1.size() || j < res2.size())) {
+            if (i >= res1.size() || j < res2.size() && res1.get(i).weight < res2.get(j).weight) {
+                if (!ids.contains(res2.get(j).entry.getId())) {
+                    resk.add(res2.get(j));
+                    ids.add(res2.get(j).entry.getId());
+                }
+                j++;
+            } else {
+                if (!ids.contains(res1.get(i).entry.getId())) {
+                    resk.add(res1.get(i));
+                    ids.add(res1.get(i).entry.getId());
+                }
+                i++;
+            }
+        }
+        return resk;
+    }
+
     public ArrayList<WeightedEntry> getMostSimilarEntries(AztecEntry e, int k, boolean useTags) {
         ArrayList<WeightedEntry> res = new ArrayList<>();
         String desc = e.getDescription();
@@ -193,11 +304,11 @@ public class SimilarityComputation {
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
         SimilarityComputation sim = new SimilarityComputation();
-        for (AztecEntry e : CachedData.entryMap.values()) {            
+        for (AztecEntry e : CachedData.entryMap.values()) {
             System.out.println("=======");
             System.out.println(e.getId() + " " + e.getName() + ": " + truncate(e.getDescription(), 100));
             System.out.println("Using tags");
-            ArrayList<WeightedEntry> res = sim.getMostSimilarEntries(e, 5, true);            
+            ArrayList<WeightedEntry> res = sim.getMostSimilarEntries(e, 5, true);
             for (WeightedEntry we : res) {
                 System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
             }
