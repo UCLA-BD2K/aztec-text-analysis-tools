@@ -26,20 +26,37 @@ public class RepresentativeProvider {
     HashMap<String, String> representative;
     Dictionary dictionary;
     int newEntries = 0;
-    String representativePath;
+    private static RepresentativeProvider singleton;
+    private static String representativesPath;
+    private static String wordnetPath;
 
-    public RepresentativeProvider(String representativePath, String dictionaryPath) throws JWNLException, FileNotFoundException {
-        this.representativePath = representativePath;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(representativePath))) {
-            representative = (HashMap<String, String>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            representative = new HashMap<>();
+    static {
+        System.out.println("Wordnet path system property: " + System.getProperty("wordnet.path"));
+        wordnetPath = System.getProperty("wordnet.path", "/home/massimo/wordnet/properties.xml");
+        System.out.println("Representatives words path system property: " + System.getProperty("representativeWords.path"));
+        representativesPath = System.getProperty("representativeWords.path", "/home/massimo/aztec/representatives.data");        
+        try {
+            singleton = new RepresentativeProvider();
+        } catch (JWNLException | FileNotFoundException ex) {
+            Logger.getLogger(RepresentativeProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-        dictionary = Dictionary.getInstance(new FileInputStream(dictionaryPath));
+    }
+
+    public static RepresentativeProvider getInstance() {
+        return singleton;
+    }
+
+    private RepresentativeProvider() throws JWNLException, FileNotFoundException {        
+        dictionary = Dictionary.getInstance(new FileInputStream(wordnetPath));
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(representativesPath))) {
+            representative = (HashMap<String, String>) ois.readObject();
+        } catch (Exception e) {
+            representative = new HashMap<>();
+        }        
     }
 
     private void saveRepresentatives() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(representativePath))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(representativesPath))) {
             oos.writeObject(representative);
         } catch (Exception ex) {
             Logger.getLogger(RepresentativeProvider.class.getName()).log(Level.SEVERE, null, ex);
@@ -54,7 +71,7 @@ public class RepresentativeProvider {
             posw = POS.VERB;
         } else if (pos.equals("JJ")) {
             posw = POS.ADJECTIVE;
-        }else {
+        } else {
             if (pos.startsWith("V") || pos.startsWith("N")) {
                 System.out.println("POS discarded: " + pos);
             }
@@ -100,7 +117,7 @@ public class RepresentativeProvider {
     }
 
     public static void main(String[] args) throws JWNLException, FileNotFoundException {
-        RepresentativeProvider p = new RepresentativeProvider("/home/massimo/aztec/representatives.data", "/home/massimo/wordnet/properties.xml");
+        RepresentativeProvider p = RepresentativeProvider.getInstance();
         System.out.println(p.getRepresentative("car", "NN"));
         System.out.println(p.getRepresentative("automobile", "NN"));
         System.out.println(p.getRepresentative("dog", "NN"));

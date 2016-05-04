@@ -25,7 +25,7 @@ public class KeywordsRank {
 
     public KeywordsRank(String text, int windowSize) throws JWNLException, FileNotFoundException {
         Tokenizer tokenizer = new Tokenizer();
-        LinkedList<String> tokens = tokenizer.simpleTokenization(text);
+        LinkedList<String> tokens = tokenizer.tokenize(text);
         HashSet<String> distinctTokens = new HashSet<>(tokens);
         int n = 0;
         for (String t : distinctTokens) {
@@ -87,6 +87,32 @@ public class KeywordsRank {
         int i = 0;
         while (i < ordered.length && rank[ordered[i]] >= minRank) {
             res.add(keywords.get(ordered[i]));
+            i++;
+        }
+        return res;
+    }
+
+    public List<RankedString> topRankedKeywords(Integer k) {
+        if (k == null) {
+            return topRankedKeywords();
+        }
+        if (k > keywords.size()) {
+            k = keywords.size();
+        }
+        LinkedList<RankedString> res = new LinkedList<>();
+        for (int i = 0; i < k; i++) {
+            res.add(new RankedString(keywords.get(ordered[i]), rank[ordered[i]]));
+        }
+        return res;
+
+    }
+
+    public List<RankedString> topRankedKeywords() {
+        LinkedList<RankedString> res = new LinkedList<>();
+        double minRank = rank[ordered[0]] * 0.9;
+        int i = 0;
+        while (i < ordered.length && rank[ordered[i]] >= minRank) {
+            res.add(new RankedString(keywords.get(ordered[i]), rank[ordered[i]]));
             i++;
         }
         return res;

@@ -211,11 +211,7 @@ public class Tokenizer {
         //Properties propsTree = new Properties();
         //propsTree.put("annotators", "tokenize, ssplit, parse");
         //pipelineTree = new StanfordCoreNLP(propsTree);
-        System.out.println("Wordnet path system property: "+System.getProperty("wordnet.path"));
-        String wordnetPath = System.getProperty("wordnet.path", "/home/massimo/wordnet/properties.xml");
-        System.out.println("Representatives path system property: "+System.getProperty("representativeWords.path"));
-        String representativesPath = System.getProperty("representativeWords.path", "/home/massimo/aztec/representatives.data");
-        representativeProvider = new RepresentativeProvider(representativesPath, wordnetPath);
+        representativeProvider = RepresentativeProvider.getInstance();
     }
     
     public LinkedList<String> tokenize(String text) {
