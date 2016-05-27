@@ -18,9 +18,9 @@ public class RankedString implements Externalizable, Comparable<RankedString> {
 
     String string;
     double rank;
-    
+
     public RankedString() {
-        
+
     }
 
     public RankedString(String string, double rank) {
@@ -57,8 +57,13 @@ public class RankedString implements Externalizable, Comparable<RankedString> {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        string=(String)in.readObject();
-        rank=in.readDouble();
+        string = (String) in.readObject();
+        rank = in.readDouble();
+    }
+
+    @Override
+    public String toString() {
+        return string + " " + rank;
     }
 
 }

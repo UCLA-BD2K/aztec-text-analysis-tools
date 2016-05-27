@@ -48,7 +48,7 @@ public class WeightedEdgeGraph {
             double[] newRes = new double[n];
             for (int v = 0; v < n; v++) {
                 //update rank of v
-                newRes[v] = 1 - d;
+                newRes[v] = 1 - d; //this should be divided by the number of nodes!
                 for (int u = 0; u < n; u++) {
                     if (u != v) {
                         newRes[v] += res[u] * adjustedWeights[u][v];

@@ -38,13 +38,14 @@ public class KeywordsBuilder {
                 try {
                     KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
                     l.addAll(kr.topRankedKeywords(20));
+                    //System.out.println(entry.getDescription() + " -> " + l);
                 } catch (Exception ex) {
                     Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
 
-        System.out.println("Writing keywords to file "+outputPath);
+        System.out.println("Writing keywords to file " + outputPath);
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outputPath))) {
             out.writeObject(res);
         } catch (Exception ex) {

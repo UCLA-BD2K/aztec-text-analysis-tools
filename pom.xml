@@ -32,7 +32,13 @@
             <artifactId>stanford-corenlp</artifactId>
             <version>3.6.0</version>
             <classifier>models</classifier>
-        </dependency>                
+        </dependency> 
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.38</version>            
+        </dependency>
+                           
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

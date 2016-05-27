@@ -23,7 +23,7 @@ public class KeywordsRank {
     double[] rank;
     Integer[] ordered;
 
-    public KeywordsRank(String text, int windowSize) throws JWNLException, FileNotFoundException {
+    public KeywordsRank(String text, int... windowSizes) throws JWNLException, FileNotFoundException {
         Tokenizer tokenizer = new Tokenizer();
         LinkedList<String> tokens = tokenizer.tokenize(text);
         HashSet<String> distinctTokens = new HashSet<>(tokens);
@@ -34,29 +34,37 @@ public class KeywordsRank {
             n++;
         }
         g = new WeightedEdgeGraph(n);
-        if (windowSize > tokens.size()) {
-            windowSize = tokens.size();
-        }
-        LinkedList<Integer> window = new LinkedList<>();
-        Iterator<String> it = tokens.iterator();
-        //init window
-        for (int i = 0; i < windowSize; i++) {
-            String w = it.next();
-            int idw = keywordIds.get(w);
-            for (int idw2 : window) {
-                g.addWeight(idw, idw2, 1);
+        for (int windowSize : windowSizes) {
+            if (windowSize > tokens.size()) {
+                windowSize = tokens.size();
             }
-            window.addLast(idw);
-        }
-        //advance window
-        while (it.hasNext()) {
-            String w = it.next();
-            int idw = keywordIds.get(w);
-            window.removeFirst();
-            for (int idw2 : window) {
-                g.addWeight(idw, idw2, 1);
+            LinkedList<Integer> window = new LinkedList<>();
+            Iterator<String> it = tokens.iterator();
+            //init window
+            int i = 0;
+            for (; i < windowSize; i++) {
+                String w = it.next();
+                int idw = keywordIds.get(w);
+                int j = 0;
+                for (int idw2 : window) {
+                    g.addWeight(idw, idw2, 1.0 / (i - j));
+                    j++;
+                }
+                window.addLast(idw);
             }
-            window.addLast(idw);
+            //advance window
+            while (it.hasNext()) {
+                String w = it.next();
+                int idw = keywordIds.get(w);
+                window.removeFirst();
+                int j = i - windowSize + 1; //i is increase from previous iteration
+                for (int idw2 : window) {
+                    g.addWeight(idw, idw2, 1.0 / (i - j));
+                    j++;
+                }                
+                window.addLast(idw);
+                i++;
+            }
         }
         rank = g.computeNodeRank(0.85, 1, 0.001);
         ordered = new Integer[n];
