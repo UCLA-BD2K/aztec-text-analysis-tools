@@ -42,10 +42,10 @@ public class SimilarityComputation {
                 union.add(tag);
             }
         }
-        if (intersection.size() > 0) {
-            System.out.print("");
+        if (intersection.isEmpty()) {
+            return 0;
         }
-        return (1.0 + intersection.size()) / (1.0 + union.size());
+        return (1.0 * intersection.size()) / (1.0 * union.size());
     }
 
     public ArrayList<WeightedEntry> getMostSimilarEntries(String entryId, int k, boolean useTags) {
@@ -121,36 +121,36 @@ public class SimilarityComputation {
         }
         return resk;
     }
-    
+
     public double getKeywordDistance(Collection<RankedString> l1, Collection<RankedString> l2) {
-        HashMap<String, Double> w1=new HashMap<>();
-        HashMap<String, Double> w2=new HashMap<>();
-        double totW1=0;
-        for (RankedString s:l1) {
+        HashMap<String, Double> w1 = new HashMap<>();
+        HashMap<String, Double> w2 = new HashMap<>();
+        double totW1 = 0;
+        for (RankedString s : l1) {
             w1.put(s.getString(), s.getRank());
-            totW1+=s.getRank();
+            totW1 += s.getRank();
         }
-        double totW2=0;
-        for (RankedString s:l2) {
+        double totW2 = 0;
+        for (RankedString s : l2) {
             w2.put(s.getString(), s.getRank());
-            totW2+=s.getRank();
+            totW2 += s.getRank();
         }
-        double intersectionW=0;
-        for (String s:w1.keySet()) {
+        double intersectionW = 0;
+        for (String s : w1.keySet()) {
             if (w2.containsKey(s)) {
-                intersectionW=w1.get(s)/totW1 + w2.get(s)/totW2;
+                intersectionW = w1.get(s) / totW1 + w2.get(s) / totW2;
             }
         }
-        return intersectionW/2;
+        return intersectionW / 2;
     }
-    
+
     public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywords(String entryId, int k) {
         return getMostSimilarEntriesWithOnlyKeywords(CachedData.entryMap.get(entryId), k);
     }
-    
+
     public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywords(AztecEntry e, int k) {
         ArrayList<WeightedEntry> res = new ArrayList<>();
-        List<RankedString> l1=CachedData.keywords.get(e.getId());
+        List<RankedString> l1 = CachedData.keywords.get(e.getId());
         for (String entry : CachedData.keywords.keySet()) {
             if (entry.equals(e.getId())) {
                 continue;
@@ -172,14 +172,54 @@ public class SimilarityComputation {
         }
         return resk;
     }
-    
+
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(String eId, int k) {
+        return getMostSimilarEntriesWithOnlyKeywordsTFIDF(CachedData.entryMap.get(eId), k);
+    }
+
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(AztecEntry e, int k) {
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        HashMap<String, Double> row1 = CachedData.tfidtK.get(e.getId());
+        if (row1 != null) {
+            double length1 = CachedData.documentLengthK.get(e.getId());
+            for (String entry : CachedData.tfidtK.keySet()) {
+                double length2 = CachedData.documentLengthK.get(entry);
+                HashMap<String, Double> row2 = CachedData.tfidtK.get(entry);
+                double product = 0;
+                for (String w : row1.keySet()) {
+                    Double val = row2.get(w);
+                    if (val != null) {
+                        product += val * row1.get(w);
+                    }
+                }
+                double sim = product / (length1 * length2);
+                if (Double.isFinite(sim)) {
+                    res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
+                }
+            }
+        }
+
+        Collections.sort(res);
+        ArrayList<WeightedEntry> resk = new ArrayList<>();
+        for (WeightedEntry we : res) {
+            if (we.entry.getId().equals(e.getId())) {
+                continue;
+            }
+            if (resk.size() == k) {
+                break;
+            }
+            resk.add(we);
+        }
+        return resk;
+    }
 
     public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyDescription(AztecEntry e, int k) {
         ArrayList<WeightedEntry> res = new ArrayList<>();
         String desc = e.getDescription();
         if (desc != null) {
             LinkedList<String> tokens = tokenizer.tokenize(desc);
-            HashMap<String, Integer> wordCount = new HashMap<>();CachedData.keywords.get(e.getId());
+            HashMap<String, Integer> wordCount = new HashMap<>();
+            CachedData.keywords.get(e.getId());
             int max = 1;
             for (String w : tokens) {
                 Integer c = wordCount.get(w);
@@ -345,6 +385,86 @@ public class SimilarityComputation {
         return res;
     }
 
+    public ArrayList<WeightedEntry> getMostSimilarEntries(String eId, int k, Double simW, Double tagW) {
+        return getMostSimilarEntries(CachedData.getEntries().get(eId), k, simW, tagW);
+    }
+
+    public ArrayList<WeightedEntry> getMostSimilarEntries(AztecEntry e, int k, Double simW, Double tagW) {
+        if (simW == null || tagW == null) {
+            simW = 0.5;
+            tagW = 0.5;
+        }
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        if (e == null) {
+            return res;
+        }
+        String desc = e.getDescription();
+        if (desc != null) {
+            LinkedList<String> tokens = tokenizer.tokenize(desc);
+            HashMap<String, Integer> wordCount = new HashMap<>();
+            int max = 1;
+            for (String w : tokens) {
+                Integer c = wordCount.get(w);
+                if (c == null) {
+                    wordCount.put(w, 1);
+                } else {
+                    wordCount.put(w, c + 1);
+                    max = Math.max(max, c + 1);
+                }
+            }
+            HashMap<String, Double> queryTfidt = new HashMap<>();
+            double queryLength = 0;
+            for (String w : wordCount.keySet()) {
+                Double val = CachedData.idf.get(w);
+                if (val != null) {
+                    val *= 0.5 + 0.5 * wordCount.get(w) / max;
+                    queryLength += val * val;
+                    queryTfidt.put(w, val);
+                }
+            }
+            queryLength = Math.sqrt(queryLength);
+            for (String entry : CachedData.tfidt.keySet()) {
+                double docLength = CachedData.documentLength.get(entry);
+                HashMap<String, Double> row = CachedData.tfidt.get(entry);
+                if (row != null && !row.isEmpty()) {
+                    double product = 0;
+                    for (String w : wordCount.keySet()) {
+                        Double val = row.get(w);
+                        if (val != null) {
+                            product += val * queryTfidt.get(w);
+                        }
+                    }
+                    double sim = product / (queryLength * docLength);
+                    if (CachedData.entryMap.get(entry).getTags() != null && CachedData.entryMap.get(entry).getTags().size() > 0
+                            && e.getTags() != null && e.getTags().size() > 0) {
+                        res.add(new WeightedEntry(CachedData.entryMap.get(entry),
+                                (sim * simW + getTagDistance(CachedData.entryMap.get(entry), e) * tagW) / (simW + tagW)
+                        ));
+                    } else {
+                        res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
+                    }
+                } else {
+                    res.add(new WeightedEntry(CachedData.entryMap.get(entry), getTagDistance(CachedData.entryMap.get(entry), e)));
+                }
+            }
+            Collections.sort(res);
+            ArrayList<WeightedEntry> resk = new ArrayList<>();
+            for (WeightedEntry we : res) {
+                if (we.entry.getId().equals(e.getId())) {
+                    continue;
+                }
+                if (resk.size() == k) {
+                    break;
+                }
+                //System.out.println(we.entry.getName() + " " + we.weight);
+                resk.add(we);
+            }
+            return resk;
+        } else {
+            return getMostSimilarEntriesWithOnlyTags(e, k);
+        }
+    }
+
     public static String truncate(String s, int length) {
         if (s == null) {
             return "";
@@ -362,16 +482,27 @@ public class SimilarityComputation {
         for (AztecEntry e : CachedData.entryMap.values()) {
             System.out.println("=======");
             System.out.println(e.getId() + " " + e.getName() + ": " + truncate(e.getDescription(), 100));
-            System.out.println("Using tags");
+            System.out.println("Combining description and tags");
             ArrayList<WeightedEntry> res = sim.getMostSimilarEntries(e, 5, true);
             for (WeightedEntry we : res) {
                 System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
             }
-            System.out.println("Not using tags");
-            res = sim.getMostSimilarEntries(e, 5, false);
+            System.out.println("Only description");
+            res = sim.getMostSimilarEntriesWithOnlyDescription(e, 5);
             for (WeightedEntry we : res) {
                 System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
             }
+            System.out.println("Description and tags separately");
+            res = sim.getMostSimilarEntries(e, 5, 0.5, 0.5);
+            for (WeightedEntry we : res) {
+                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+            }
+            System.out.println("TFIDF computed on keywords obtained through TextRank");
+            res = sim.getMostSimilarEntriesWithOnlyKeywordsTFIDF(e, 5);
+            for (WeightedEntry we : res) {
+                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+            }            
+            
         }
         long end = System.currentTimeMillis();
         long sec = (end - start) / 1000;

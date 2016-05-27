@@ -1,6 +1,7 @@
 package edu.ucla.cs.scai.aztec;
 
 import edu.ucla.cs.scai.aztec.utils.ImageUtils;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
@@ -15,19 +16,19 @@ public class AztecEntry {
     String logo;
     String source;
     String language;
-    String[] platforms;
+    ArrayList<String> platforms;
     String sourceCodeURL;
-    String[] linkDescriptions;
-    String[] linkUrls;
-    String[] institutions;
-    String[] maintainers;
-    String[] maintainerEmails;
-    String[] types;
-    String[] tags;
-    String[] domains;
+    ArrayList<String> linkDescriptions;
+    ArrayList<String> linkUrls;
+    ArrayList<String> institutions;
+    ArrayList<String> maintainers;
+    ArrayList<String> maintainerEmails;
+    ArrayList<String> types;
+    ArrayList<String> tags;
+    ArrayList<String> domains;
     Date[] dateCreated;
     Date[] dateUpdated;
-    String[] owners;
+    ArrayList<String> owners;
     String id;
     String version;
     double[] logoHistogram;
@@ -72,84 +73,12 @@ public class AztecEntry {
         this.language = language;
     }
 
-    public String[] getPlatforms() {
-        return platforms;
-    }
-
-    public void setPlatforms(String[] platforms) {
-        this.platforms = platforms;
-    }
-
     public String getSourceCodeURL() {
         return sourceCodeURL;
     }
 
     public void setSourceCodeURL(String sourceCodeURL) {
         this.sourceCodeURL = sourceCodeURL;
-    }
-
-    public String[] getLinkDescriptions() {
-        return linkDescriptions;
-    }
-
-    public void setLinkDescriptions(String[] linkDescriptions) {
-        this.linkDescriptions = linkDescriptions;
-    }
-
-    public String[] getLinkUrls() {
-        return linkUrls;
-    }
-
-    public void setLinkUrls(String[] linkUrls) {
-        this.linkUrls = linkUrls;
-    }
-
-    public String[] getInstitutions() {
-        return institutions;
-    }
-
-    public void setInstitutions(String[] institutions) {
-        this.institutions = institutions;
-    }
-
-    public String[] getMaintainers() {
-        return maintainers;
-    }
-
-    public void setMaintainers(String[] maintainers) {
-        this.maintainers = maintainers;
-    }
-
-    public String[] getMaintainerEmails() {
-        return maintainerEmails;
-    }
-
-    public void setMaintainerEmails(String[] maintainerEmails) {
-        this.maintainerEmails = maintainerEmails;
-    }
-
-    public String[] getTypes() {
-        return types;
-    }
-
-    public void setTypes(String[] types) {
-        this.types = types;
-    }
-
-    public String[] getTags() {
-        return tags;
-    }
-
-    public void setTags(String[] tags) {
-        this.tags = tags;
-    }
-
-    public String[] getDomains() {
-        return domains;
-    }
-
-    public void setDomains(String[] domains) {
-        this.domains = domains;
     }
 
     public Date[] getDateCreated() {
@@ -168,14 +97,6 @@ public class AztecEntry {
         this.dateUpdated = dateUpdated;
     }
 
-    public String[] getOwners() {
-        return owners;
-    }
-
-    public void setOwners(String[] owners) {
-        this.owners = owners;
-    }
-
     public String getId() {
         return id;
     }
@@ -190,6 +111,86 @@ public class AztecEntry {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public ArrayList<String> getPlatforms() {
+        return platforms;
+    }
+
+    public void setPlatforms(ArrayList<String> platforms) {
+        this.platforms = platforms;
+    }
+
+    public ArrayList<String> getLinkDescriptions() {
+        return linkDescriptions;
+    }
+
+    public void setLinkDescriptions(ArrayList<String> linkDescriptions) {
+        this.linkDescriptions = linkDescriptions;
+    }
+
+    public ArrayList<String> getLinkUrls() {
+        return linkUrls;
+    }
+
+    public void setLinkUrls(ArrayList<String> linkUrls) {
+        this.linkUrls = linkUrls;
+    }
+
+    public ArrayList<String> getInstitutions() {
+        return institutions;
+    }
+
+    public void setInstitutions(ArrayList<String> institutions) {
+        this.institutions = institutions;
+    }
+
+    public ArrayList<String> getMaintainers() {
+        return maintainers;
+    }
+
+    public void setMaintainers(ArrayList<String> maintainers) {
+        this.maintainers = maintainers;
+    }
+
+    public ArrayList<String> getMaintainerEmails() {
+        return maintainerEmails;
+    }
+
+    public void setMaintainerEmails(ArrayList<String> maintainerEmails) {
+        this.maintainerEmails = maintainerEmails;
+    }
+
+    public ArrayList<String> getTypes() {
+        return types;
+    }
+
+    public void setTypes(ArrayList<String> types) {
+        this.types = types;
+    }
+
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(ArrayList<String> tags) {
+        this.tags = tags;
+    }
+
+    public ArrayList<String> getDomains() {
+        return domains;
+    }
+
+    public void setDomains(ArrayList<String> domains) {
+        this.domains = domains;
+    }
+
+    public ArrayList<String> getOwners() {
+        return owners;
+    }
+
+    public void setOwners(ArrayList<String> owners) {
+        this.owners = owners;
     }
 
     private void computeLogoHistogram() throws Exception {

@@ -21,6 +21,9 @@ public class CachedData {
     static HashMap<String, Double> documentLength;
     static HashMap<String, HashMap<String, Double>> tfidt;
     static HashMap<String, Double> idf;
+    static HashMap<String, Double> documentLengthK;
+    static HashMap<String, HashMap<String, Double>> tfidtK;
+    static HashMap<String, Double> idfK;
     static HashMap<String, AztecEntry> entryMap;
     static ArrayList<AztecEntry> entryArray;
     static HashMap<String, List<RankedString>> keywords;
@@ -40,6 +43,22 @@ public class CachedData {
         TfIdfBuilder builder = new TfIdfBuilder();
         builder.buildTfIdfMatrix(entryArray, tfidtPath);
     }
+    
+    private static void loadTfidfKData() throws Exception {
+        System.out.println("TF/IDF on keywords path system property: " + System.getProperty("tfidfk.path"));
+        String tfidtPath = System.getProperty("tfidfk.path", "/home/massimo/aztec/tfidfk.data");
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath));
+        documentLengthK = (HashMap<String, Double>) ois.readObject();
+        tfidtK = (HashMap<String, HashMap<String, Double>>) ois.readObject();
+        idfK = (HashMap<String, Double>) ois.readObject();
+    }
+
+    private static void buildTfidfKData() throws Exception {
+        System.out.println("TF/IDF on keywords path system property: " + System.getProperty("tfidfk.path"));
+        String tfidtPath = System.getProperty("tfidfk.path", "/home/massimo/aztec/tfidfk.data");
+        TfIdfBuilderKeywords builder = new TfIdfBuilderKeywords();
+        builder.buildTfIdfMatrix(entryArray, tfidtPath);
+    }    
     
     private static void loadKeywords() throws Exception {
         System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
@@ -88,6 +107,19 @@ public class CachedData {
             //tfidf data failed, try to reconstruct it
             try {
                 buildKeywords();
+            } catch (Exception ex2) {
+                Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
+            }
+        }  
+        
+        try {
+            loadTfidfKData();
+        } catch (Exception ex) {
+            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
+            //tfidf data failed, try to reconstruct it
+            try {
+                buildTfidfKData();
+                loadTfidfKData();
             } catch (Exception ex2) {
                 Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
             }
