@@ -56,7 +56,7 @@ public class Search {
 
         Collections.sort(res);
         ArrayList<AztecEntry> resk = new ArrayList<>();
-        for (int i = offset; i < Math.min(res.size(), limit - offset); i++) {
+        for (int i = offset; i < Math.min(res.size(), limit + offset); i++) {
             WeightedEntry we = res.get(i);
             resk.add(we.entry);
         }
