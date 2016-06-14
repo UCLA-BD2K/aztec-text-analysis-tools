@@ -166,6 +166,7 @@ public class TfIdfBuilder {
         System.out.println("Entries path system property: "+System.getProperty("entries.path"));
         String entriesPath = System.getProperty("entries.path", "/home/massimo/Downloads/solrResources.json");
         System.out.println("TF/IDF path system property: "+System.getProperty("tfidf.path"));
+        System.out.println("TF/IDF on keykors path system property: "+System.getProperty("tfidfk.path"));
         String tfidtPath = System.getProperty("tfidf.path","/home/massimo/aztec/tfidf.data");
         ArrayList<AztecEntry> entries = new AztecEntryProviderFromJsonFile(entriesPath).load();
         TfIdfBuilder builder = new TfIdfBuilder();
