@@ -52,51 +52,6 @@ public class SimilarityComputation {
         return getMostSimilarEntries(CachedData.entryMap.get(entryId), k, useTags);
     }
 
-    public ArrayList<WeightedEntry> getMostSimilarEntriesToQuery(String qs, int k) {
-        ArrayList<WeightedEntry> res = new ArrayList<>();
-        LinkedList<String> tokens = tokenizer.tokenize(qs);
-        HashMap<String, Integer> wordCount = new HashMap<>();
-        int max = 1;
-        for (String w : tokens) {
-            Integer c = wordCount.get(w);
-            if (c == null) {
-                wordCount.put(w, 1);
-            } else {
-                wordCount.put(w, c + 1);
-                max = Math.max(max, c + 1);
-            }
-        }
-        HashMap<String, Double> queryTfidt = new HashMap<>();
-        double queryLength = 0;
-        for (String w : wordCount.keySet()) {
-            Double val = CachedData.idf.get(w);
-            if (val != null) {
-                //val *= 1.0 * wordCount.get(w) / max;
-                val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
-                queryLength += val * val;
-                queryTfidt.put(w, val);
-            }
-        }
-        queryLength = Math.sqrt(queryLength);
-        for (String entry : CachedData.tfidt.keySet()) {
-            double docLength = CachedData.documentLength.get(entry);
-            HashMap<String, Double> row = CachedData.tfidt.get(entry);
-            double sim = 0;
-            for (String w : wordCount.keySet()) {
-                Double val = row.get(w);
-                if (val != null) {
-                    sim += val * queryTfidt.get(w);
-                }
-            }
-            sim /= (queryLength * docLength);
-            if (sim > 0) {
-                res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
-            }
-        }
-
-        return res;
-    }
-
     public ArrayList<WeightedEntry> getMostSimilarEntriesWithSeparateTags(String entryId, int k) {
         return getMostSimilarEntriesWithSeparateTags(CachedData.entryMap.get(entryId), k);
     }
@@ -173,11 +128,14 @@ public class SimilarityComputation {
         return resk;
     }
 
-    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(String eId, int k) {
-        return getMostSimilarEntriesWithOnlyKeywordsTFIDF(CachedData.entryMap.get(eId), k);
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(String eId, int k, Double threshold) {
+        return getMostSimilarEntriesWithOnlyKeywordsTFIDF(CachedData.entryMap.get(eId), k, threshold);
     }
 
-    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(AztecEntry e, int k) {
+    public ArrayList<WeightedEntry> getMostSimilarEntriesWithOnlyKeywordsTFIDF(AztecEntry e, int k, Double threshold) {
+        if (threshold == null) {
+            threshold = 0.2;
+        }
         ArrayList<WeightedEntry> res = new ArrayList<>();
         HashMap<String, Double> row1 = CachedData.tfidtK.get(e.getId());
         if (row1 != null) {
@@ -206,6 +164,9 @@ public class SimilarityComputation {
                 continue;
             }
             if (resk.size() == k) {
+                break;
+            }
+            if (we.weight < threshold) {
                 break;
             }
             resk.add(we);
@@ -498,15 +459,14 @@ public class SimilarityComputation {
                 System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
             }
             System.out.println("TFIDF computed on keywords obtained through TextRank");
-            res = sim.getMostSimilarEntriesWithOnlyKeywordsTFIDF(e, 5);
+            res = sim.getMostSimilarEntriesWithOnlyKeywordsTFIDF(e, 5, 0.2);
             for (WeightedEntry we : res) {
                 System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
-            }            
-            
+            }
+
         }
         long end = System.currentTimeMillis();
         long sec = (end - start) / 1000;
         System.out.println("Running time: " + (sec / 60) + "'" + (sec % 60) + "\"");
     }
-
 }
