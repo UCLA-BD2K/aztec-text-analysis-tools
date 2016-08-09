@@ -1,6 +1,7 @@
 package edu.ucla.cs.scai.aztec.summarization;
 
 import edu.ucla.cs.scai.aztec.keyphrase.Tokenizer;
+import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
 import edu.ucla.cs.scai.aztec.AztecEntry;
 
 import java.io.*;
@@ -18,12 +19,13 @@ import net.sf.extjwnl.JWNLException;
  */
 public class KeywordsBuilder {
 
-    Tokenizer tokenizer;
+//    Tokenizer tokenizer;
+    TextParser textparser = new TextParser();
 
     static final double log2 = Math.log(2);
 
     public KeywordsBuilder() throws JWNLException, FileNotFoundException {
-        tokenizer = new Tokenizer();
+        textparser = new TextParser();
     }
 
     public HashMap<String, List<RankedString>> buildKeywords(Collection<AztecEntry> entries, String outputPath) throws IOException {
@@ -55,6 +57,7 @@ public class KeywordsBuilder {
 
     public HashMap<String, List<RankedString>> buildKeywordsTest(String infile, String outputPath) throws IOException {
         // The one I am currently using.
+        // input contains all the sbatracts and description
 
         HashMap<String, List<RankedString>> res = new HashMap<>();
         BufferedReader reader = new BufferedReader(new FileReader(infile));
@@ -85,10 +88,10 @@ public class KeywordsBuilder {
         return res;
     }
 
-    public static void main (String[] args)throws IOException, JWNLException{
-        String infile = "src/main/data/abstract_removeurl.txt";
-        String outfile = "src/main/data/textrank.data";
-        KeywordsBuilder KB = new KeywordsBuilder();
-        HashMap<String, List<RankedString>> res = KB.buildKeywordsTest(infile,outfile);
-    }
+//    public static void main (String[] args)throws IOException, JWNLException{
+//        String infile = "src/main/data/abstract_removeurl.txt";
+//        String outfile = "src/main/data/textrank.data";
+//        KeywordsBuilder KB = new KeywordsBuilder();
+//        HashMap<String, List<RankedString>> res = KB.buildKeywordsTest(infile,outfile);
+//    }
 }

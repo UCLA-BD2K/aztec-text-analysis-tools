@@ -16,14 +16,14 @@ import java.util.Map;
  */
 public class TfIdfBuilderKeywords {
     // copy from CachedData
-    static HashMap<String, List<RankedString>> keywords;
-
-    private static void loadKeywords() throws Exception {
-        System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
-        String keywordsPath = System.getProperty("keywords.path", "src/main/data/expendedKeywords.data");
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(keywordsPath));
-        keywords = (HashMap<String, List<RankedString>>) ois.readObject();
-    }
+//    static HashMap<String, List<RankedString>> keywords;
+//
+//    private static void loadKeywords() throws Exception {
+//        System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
+//        String keywordsPath = System.getProperty("keywords.path", "src/main/data/expendedKeywords.data");
+//        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(keywordsPath));
+//        keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+//    }
 
     static final double log2 = Math.log(2);
 
@@ -35,7 +35,7 @@ public class TfIdfBuilderKeywords {
         HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
         HashMap<String, HashMap<String, Double>> fOfWordsInDocuments = new HashMap<>();
         for (AztecEntry entry : entries) {
-            List<RankedString> rankedTokens = CachedData.keywords.get(entry.getId());
+            List<RankedString> rankedTokens = CachedData.expkeywords.get(entry.getId()); // change to expanded keywords as input
             HashMap<String, Double> wordCount = new HashMap<>();
             fOfWordsInDocuments.put(entry.getId(), wordCount);
             for (RankedString w : rankedTokens) {
@@ -46,6 +46,7 @@ public class TfIdfBuilderKeywords {
                     wordCount.put(w.getString(), c + w.getRank());
                 }
             }
+            // for each words, how many document contains the words.
 
             for (String w : wordCount.keySet()) {
                 Integer c = nOfDocsWithWord.get(w);
@@ -57,11 +58,11 @@ public class TfIdfBuilderKeywords {
             }
         }
 
-        HashMap<String, Double> documentLength = new HashMap<>();
-        HashMap<String, HashMap<String, Double>> tfidt = new HashMap<>();
-        HashMap<String, Double> idf = new HashMap<>();
+        HashMap<String, Double> documentLength = new HashMap<>(); // the norm of each vector
+        HashMap<String, HashMap<String, Double>> tfidt = new HashMap<>(); // tfidf matrix
+        HashMap<String, Double> idf = new HashMap<>(); //
         double N = fOfWordsInDocuments.keySet().size();
-        for (String w : nOfDocsWithWord.keySet()) {
+        for (String w : nOfDocsWithWord.keySet()) { // for each word: calculate idf value
             double val = Math.log(N / nOfDocsWithWord.get(w)) / log2;
             idf.put(w, val);
         }
@@ -107,90 +108,90 @@ public class TfIdfBuilderKeywords {
         }
 
     }
-    public void buildTfIdfMatrixTest(String outputPath) throws Exception, IOException {
-        // The one I am currently using
-        System.out.println("Start to calculate tfidf");
-
-        HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
-        HashMap<String, HashMap<String, Double>> fOfWordsInDocuments = new HashMap<>();
-        this.loadKeywords();
-        for (String id : keywords.keySet()) {
-            //List<RankedString> rankedTokens = CachedData.keywords.get(entry.getId());
-            List<RankedString> rankedTokens = keywords.get(id);
-            HashMap<String, Double> wordCount = new HashMap<>();
-            fOfWordsInDocuments.put(id, wordCount);
-            for (RankedString w : rankedTokens) {
-                Double c = wordCount.get(w.getString());
-                if (c == null) {
-                    wordCount.put(w.getString(), w.getRank());
-                } else {
-                    wordCount.put(w.getString(), c + w.getRank());
-                }
-            }
-
-            for (String w : wordCount.keySet()) {
-                Integer c = nOfDocsWithWord.get(w);
-                if (c == null) {
-                    nOfDocsWithWord.put(w, 1);
-                } else {
-                    nOfDocsWithWord.put(w, c + 1);
-                }
-            }
-        }
-
-        HashMap<String, Double> documentLength = new HashMap<>();
-        HashMap<String, HashMap<String, Double>> tfidt = new HashMap<>();
-        HashMap<String, Double> idf = new HashMap<>();
-        double N = fOfWordsInDocuments.keySet().size();
-        for (String w : nOfDocsWithWord.keySet()) {
-            double val = Math.log(N / nOfDocsWithWord.get(w)) / log2;
-            idf.put(w, val);
-        }
-        HashMap<String, Double> columnLengths = new HashMap<>();
-        //multiply tf by idf
-        for (String entry : fOfWordsInDocuments.keySet()) {
-            HashMap<String, Double> row = new HashMap<>();
-            HashMap<String, Double> wordCount = fOfWordsInDocuments.get(entry);
-            tfidt.put(entry, row);
-            for (String w : wordCount.keySet()) {
-                double val = wordCount.get(w) * idf.get(w);
-                row.put(w, val);
-                Double colLength = columnLengths.get(w);
-                if (colLength == null) {
-                    colLength = 0d;
-                }
-                colLength += val * val;
-                columnLengths.put(w, colLength);
-            }
-        }
-
-        for (Map.Entry<String, Double> e : columnLengths.entrySet()) {
-            e.setValue(Math.sqrt(e.getValue()));
-        }
-
-        //now divide each cell by the length of its column
-        //and compute the length of the document
-        for (String entry : tfidt.keySet()) {
-            HashMap<String, Double> row = tfidt.get(entry);
-            double length = 0;
-            for (Map.Entry<String, Double> e : row.entrySet()) {
-                e.setValue(e.getValue() / columnLengths.get(e.getKey()));
-                length += e.getValue() * e.getValue();
-            }
-            documentLength.put(entry, Math.sqrt(length));
-        }
-
-        System.out.println("Writing matrix to file");
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outputPath))) {
-            out.writeObject(documentLength);
-            out.writeObject(tfidt);
-            out.writeObject(idf);
-        }
-    }
-    public static void main(String[] args) throws Exception{
-        System.out.println("TF/IDF on keywords path system property: " + System.getProperty("tfidfk.path"));
-        String tfidtPath = System.getProperty("tfidfk.path", "src/main/data/expendedtfidf.data");
-        TfIdfBuilderKeywords builder = new TfIdfBuilderKeywords();
-        builder.buildTfIdfMatrixTest(tfidtPath);
-    }
+//    public void buildTfIdfMatrixTest(String outputPath) throws Exception, IOException {
+//        // The one I am currently using
+//        System.out.println("Start to calculate tfidf");
+//
+//        HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
+//        HashMap<String, HashMap<String, Double>> fOfWordsInDocuments = new HashMap<>();
+//        this.loadKeywords();
+//        for (String id : keywords.keySet()) {
+//            //List<RankedString> rankedTokens = CachedData.keywords.get(entry.getId());
+//            List<RankedString> rankedTokens = keywords.get(id);
+//            HashMap<String, Double> wordCount = new HashMap<>();
+//            fOfWordsInDocuments.put(id, wordCount);
+//            for (RankedString w : rankedTokens) {
+//                Double c = wordCount.get(w.getString());
+//                if (c == null) {
+//                    wordCount.put(w.getString(), w.getRank());
+//                } else {
+//                    wordCount.put(w.getString(), c + w.getRank());
+//                }
+//            }
+//
+//            for (String w : wordCount.keySet()) {
+//                Integer c = nOfDocsWithWord.get(w);
+//                if (c == null) {
+//                    nOfDocsWithWord.put(w, 1);
+//                } else {
+//                    nOfDocsWithWord.put(w, c + 1);
+//                }
+//            }
+//        }
+//
+//        HashMap<String, Double> documentLength = new HashMap<>();
+//        HashMap<String, HashMap<String, Double>> tfidt = new HashMap<>();
+//        HashMap<String, Double> idf = new HashMap<>();
+//        double N = fOfWordsInDocuments.keySet().size();
+//        for (String w : nOfDocsWithWord.keySet()) {
+//            double val = Math.log(N / nOfDocsWithWord.get(w)) / log2;
+//            idf.put(w, val);
+//        }
+//        HashMap<String, Double> columnLengths = new HashMap<>();
+//        //multiply tf by idf
+//        for (String entry : fOfWordsInDocuments.keySet()) {
+//            HashMap<String, Double> row = new HashMap<>();
+//            HashMap<String, Double> wordCount = fOfWordsInDocuments.get(entry);
+//            tfidt.put(entry, row);
+//            for (String w : wordCount.keySet()) {
+//                double val = wordCount.get(w) * idf.get(w);
+//                row.put(w, val);
+//                Double colLength = columnLengths.get(w);
+//                if (colLength == null) {
+//                    colLength = 0d;
+//                }
+//                colLength += val * val;
+//                columnLengths.put(w, colLength);
+//            }
+//        }
+//
+//        for (Map.Entry<String, Double> e : columnLengths.entrySet()) {
+//            e.setValue(Math.sqrt(e.getValue()));
+//        }
+//
+//        //now divide each cell by the length of its column
+//        //and compute the length of the document
+//        for (String entry : tfidt.keySet()) {
+//            HashMap<String, Double> row = tfidt.get(entry);
+//            double length = 0;
+//            for (Map.Entry<String, Double> e : row.entrySet()) {
+//                e.setValue(e.getValue() / columnLengths.get(e.getKey()));
+//                length += e.getValue() * e.getValue();
+//            }
+//            documentLength.put(entry, Math.sqrt(length));
+//        }
+//
+//        System.out.println("Writing matrix to file");
+//        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outputPath))) {
+//            out.writeObject(documentLength);
+//            out.writeObject(tfidt);
+//            out.writeObject(idf);
+//        }
+//    }
+//    public static void main(String[] args) throws Exception{
+////        System.out.println("TF/IDF on keywords path system property: " + System.getProperty("tfidfk.path"));
+////        String tfidtPath = System.getProperty("tfidfk.path", "src/main/data/expendedtfidf.data");
+//
+//
+//    }
 }

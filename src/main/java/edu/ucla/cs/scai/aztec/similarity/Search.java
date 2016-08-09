@@ -5,12 +5,14 @@
  */
 package edu.ucla.cs.scai.aztec.similarity;
 
+import edu.ucla.cs.scai.aztec.summarization.RankedString;
+import edu.ucla.cs.scai.aztec.textexpansion.TextExpansion;
+import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.dto.SearchResultPage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
+import net.sf.extjwnl.JWNLException;
+
+import java.util.*;
 
 /**
  *
@@ -18,10 +20,13 @@ import java.util.LinkedList;
  */
 public class Search {
 
-    Tokenizer tokenizer;
+    //Tokenizer tokenizer;
+    TextParser textparser;
+    TextExpansion textexpansion;
 
     public Search() throws Exception {
-        tokenizer = new Tokenizer();
+        textparser = new TextParser();
+        textexpansion = new TextExpansion();
     }
 
     public SearchResultPage searchQueryWithOnlyKeywordsTFIDF(String query, Integer offset, Integer limit) {
@@ -33,16 +38,20 @@ public class Search {
         }
         ArrayList<WeightedEntry> res = new ArrayList<>();
         try {
-            Tokenizer t = new Tokenizer();
-            LinkedList<String> tokens = t.tokenize(query);
+            //Tokenizer t = new Tokenizer();
+            TextParser tp = new TextParser();
+            TextExpansion te = new TextExpansion();
+            //LinkedList<String> tokens = t.tokenize(query);
+            LinkedList<String> origintokens = tp.queryParser(query);
+            LinkedList<RankedString> tokens  = te.queryExpansion(origintokens);
             if (!tokens.isEmpty()) {
                 for (String entry : CachedData.tfidtK.keySet()) {
                     HashMap<String, Double> row2 = CachedData.tfidtK.get(entry);
                     double product = 0;
-                    for (String w : tokens) {
-                        Double val = row2.get(w);
+                    for (RankedString w : tokens) {
+                        Double val = row2.get(w.getString());
                         if (val != null) {
-                            product += val;
+                            product += val*w.getRank(); // suppose the query has already been normalized
                         }
                     }
                     double sim = product;// / length2;
@@ -63,35 +72,55 @@ public class Search {
         return new SearchResultPage(resk, res.size());
     }
 
-    public ArrayList<WeightedEntry> getMostSimilarEntriesToQuery(String qs, int k) {
+    public ArrayList<WeightedEntry> getMostSimilarEntriesToQuery(String qs, int k) throws Exception{
+
         ArrayList<WeightedEntry> res = new ArrayList<>();
-        LinkedList<String> tokens = tokenizer.tokenize(qs);
-        HashMap<String, Integer> wordCount = new HashMap<>();
+        LinkedList<String> origintokens = new LinkedList<>();
+        origintokens = textparser.queryParser(qs);
+        LinkedList<RankedString> tokens = textexpansion.queryExpansion(origintokens);
+        HashMap<String, Double> wordCount = new HashMap<>();
         int max = 1;
-        for (String w : tokens) {
-            Integer c = wordCount.get(w);
+        for (RankedString w : tokens) {
+            //now calculating tf for words in query;
+//            Integer c = wordCount.get(w.getString());
+//            if (c == null) {
+//                wordCount.put(w.getString(), 1);
+//            } else {
+//                wordCount.put(w.getString(), c + 1);
+//                max = Math.max(max, c + 1);
+//            }
+//            Double c = wordCount.get(w.getString());
+//            if( c == null){
+//                wordCount.put(w.getString(),w.getRank());
+//            }
+//            else{
+//                Double pre = wordCount.get(w.getString());
+//                Double max_score = Math.max(pre,c);
+//                wordCount.put(w.getString(),max_score);
+//            }
+            Double c = wordCount.get(w.getString());
             if (c == null) {
-                wordCount.put(w, 1);
+                wordCount.put(w.getString(), w.getRank());
             } else {
-                wordCount.put(w, c + 1);
-                max = Math.max(max, c + 1);
+                wordCount.put(w.getString(), c + w.getRank());
             }
         }
         HashMap<String, Double> queryTfidt = new HashMap<>();
         double queryLength = 0;
         for (String w : wordCount.keySet()) {
-            Double val = CachedData.idf.get(w);
+            Double val = CachedData.idfK.get(w); ////////////////////
             if (val != null) {
                 //val *= 1.0 * wordCount.get(w) / max;
+                // the calculation methods have problem, log(w) will get to 0
                 val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
                 queryLength += val * val;
                 queryTfidt.put(w, val);
             }
         }
         queryLength = Math.sqrt(queryLength);
-        for (String entry : CachedData.tfidt.keySet()) {
-            double docLength = CachedData.documentLength.get(entry);
-            HashMap<String, Double> row = CachedData.tfidt.get(entry);
+        for (String entry : CachedData.tfidtK.keySet()) {
+            double docLength = CachedData.documentLengthK.get(entry);
+            HashMap<String, Double> row = CachedData.tfidtK.get(entry);
             double sim = 0;
             for (String w : wordCount.keySet()) {
                 Double val = row.get(w);
@@ -99,13 +128,24 @@ public class Search {
                     sim += val * queryTfidt.get(w);
                 }
             }
-            sim /= (queryLength * docLength);
+            sim /= (queryLength * docLength); // calculate cos similarity
             if (sim > 0) {
                 res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
             }
         }
+        Collections.sort(res);
+
 
         return res;
+    }
+    public static void main(String[] args) throws Exception{
+        Search handle = new Search();
+        String query = "cluster gene";
+        ArrayList<WeightedEntry> res = handle.getMostSimilarEntriesToQuery(query,10);
+        for (WeightedEntry r:res){
+            System.out.print(r.weight);
+            System.out.println(r.entry.getDescription());
+        }
     }
 
 }

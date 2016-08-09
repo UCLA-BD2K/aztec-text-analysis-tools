@@ -264,6 +264,7 @@ public class TextParser{
         }
         return  unitList;
     }
+
     public LinkedList<String> docParser(String doc) throws JWNLException, IOException {
         LinkedList<String> unitList = new LinkedList<>();
         LinkedList<String> tmpunitList = new LinkedList<>();
