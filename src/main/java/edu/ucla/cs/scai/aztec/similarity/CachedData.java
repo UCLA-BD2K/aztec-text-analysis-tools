@@ -133,6 +133,7 @@ public class CachedData {
             //tfidf data failed, try to reconstruct it
             try {
                 buildexpKeywords();
+                loadexpKeywords();
             } catch (Exception ex2) {
                 Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
             }

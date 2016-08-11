@@ -12,6 +12,7 @@ import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.dto.SearchResultPage;
 import net.sf.extjwnl.JWNLException;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -75,11 +76,14 @@ public class Search {
     public ArrayList<WeightedEntry> getMostSimilarEntriesToQuery(String qs, int k) throws Exception{
 
         ArrayList<WeightedEntry> res = new ArrayList<>();
+        ArrayList<WeightedEntry> res_sub = new ArrayList<>();
         LinkedList<String> origintokens = new LinkedList<>();
         origintokens = textparser.queryParser(qs);
         LinkedList<RankedString> tokens = textexpansion.queryExpansion(origintokens);
         HashMap<String, Double> wordCount = new HashMap<>();
         int max = 1;
+        Double max_s = 0.0;
+        Double min_s = 100.0;
         for (RankedString w : tokens) {
             //now calculating tf for words in query;
 //            Integer c = wordCount.get(w.getString());
@@ -105,18 +109,33 @@ public class Search {
                 wordCount.put(w.getString(), c + w.getRank());
             }
         }
+        for(String w:wordCount.keySet()){
+            Double val = wordCount.get(w);
+            if(val>max_s){
+                max_s = val;
+            }
+            if(val<min_s){
+                min_s = val;
+            }
+        }
         HashMap<String, Double> queryTfidt = new HashMap<>();
         double queryLength = 0;
+
         for (String w : wordCount.keySet()) {
-            Double val = CachedData.idfK.get(w); ////////////////////
+            Double val = wordCount.get(w);
+            //val = (val-min_s)/(max_s-min_s); //do the min max scaler as the documents
             if (val != null) {
                 //val *= 1.0 * wordCount.get(w) / max;
                 // the calculation methods have problem, log(w) will get to 0
-                val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
+                //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
                 queryLength += val * val;
                 queryTfidt.put(w, val);
+                System.out.print(" "+w+" ");
+                System.out.print(val);
             }
+            System.out.print("\n");
         }
+
         queryLength = Math.sqrt(queryLength);
         for (String entry : CachedData.tfidtK.keySet()) {
             double docLength = CachedData.documentLengthK.get(entry);
@@ -129,23 +148,142 @@ public class Search {
                 }
             }
             sim /= (queryLength * docLength); // calculate cos similarity
+            //sim /=(queryLength);
             if (sim > 0) {
                 res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
             }
         }
         Collections.sort(res);
+        if(res.size()>=k) {
+            res_sub = new ArrayList<>(res.subList(0, k));
+        }
+        else{
+            res_sub = new ArrayList<>(res);
+        }
 
+        for (WeightedEntry w: res_sub){
+            HashMap<String,Double> tfidf = CachedData.tfidtK.get(w.entry.getId());
+            System.out.print(w.weight);
+            System.out.println(w.entry.getDescription());
+            for(String key:tfidf.keySet()){
+                System.out.print(" "+key+" ");
+                System.out.print(tfidf.get(key));
+            }
+            System.out.print("\n---------------------\n");
+        }
 
-        return res;
+        return res_sub;
     }
+    public ArrayList<WeightedAbs> getMostSimilarAbstract(String qs, Integer k) throws JWNLException, IOException{
+        ArrayList<WeightedAbs> res = new ArrayList<>();
+        ArrayList<WeightedAbs> res_sub = new ArrayList<>();
+        LinkedList<String> origintokens = new LinkedList<>();
+        origintokens = textparser.queryParser(qs);
+        LinkedList<RankedString> tokens = textexpansion.queryExpansion(origintokens);
+        HashMap<String, Double> wordCount = new HashMap<>();
+        int max = 1;
+        Double max_s = 0.0;
+        Double min_s = 100.0;
+        for (RankedString w : tokens) {
+            //now calculating tf for words in query;
+//            Integer c = wordCount.get(w.getString());
+//            if (c == null) {
+//                wordCount.put(w.getString(), 1);
+//            } else {
+//                wordCount.put(w.getString(), c + 1);
+//                max = Math.max(max, c + 1);
+//            }
+//            Double c = wordCount.get(w.getString());
+//            if( c == null){
+//                wordCount.put(w.getString(),w.getRank());
+//            }
+//            else{
+//                Double pre = wordCount.get(w.getString());
+//                Double max_score = Math.max(pre,c);
+//                wordCount.put(w.getString(),max_score);
+//            }
+            Double c = wordCount.get(w.getString());
+            if (c == null) {
+                wordCount.put(w.getString(), w.getRank());
+            } else {
+                wordCount.put(w.getString(), c + w.getRank());
+            }
+        }
+        for(String w:wordCount.keySet()){
+            Double val = wordCount.get(w);
+            if(val>max_s){
+                max_s = val;
+            }
+            if(val<min_s){
+                min_s = val;
+            }
+        }
+        HashMap<String, Double> queryTfidt = new HashMap<>();
+        double queryLength = 0;
+
+        for (String w : wordCount.keySet()) {
+            Double val = wordCount.get(w);
+            //val = (val-min_s)/(max_s-min_s); //do the min max scaler as the documents
+            if (val != null) {
+                //val *= 1.0 * wordCount.get(w) / max;
+                // the calculation methods have problem, log(w) will get to 0
+                //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
+                queryLength += val * val;
+                queryTfidt.put(w, val);
+                System.out.print(" "+w+" ");
+                System.out.print(val);
+            }
+            System.out.print("\n");
+        }
+
+        queryLength = Math.sqrt(queryLength);
+        for (String entry : AbsCachedData.tfidtK.keySet()) {
+            double docLength = AbsCachedData.documentLengthK.get(entry);
+            HashMap<String, Double> row = AbsCachedData.tfidtK.get(entry);
+            double sim = 0;
+            for (String w : wordCount.keySet()) {
+                Double val = row.get(w);
+                if (val != null) {
+                    sim += val * queryTfidt.get(w);
+                }
+            }
+            //sim /= (queryLength * docLength); // calculate cos similarity
+            sim /=(queryLength);
+            if (sim > 0) {
+                res.add(new WeightedAbs(AbsCachedData.entryMap.get(entry), sim));
+            }
+        }
+        Collections.sort(res);
+        if(res.size()>=k) {
+            res_sub = new ArrayList<>(res.subList(0, k));
+        }
+        else{
+            res_sub = new ArrayList<>(res);
+        }
+
+        for (WeightedAbs w: res_sub){
+            HashMap<String,Double> tfidf = AbsCachedData.tfidtK.get(w.entry.getId());
+            System.out.print(w.weight);
+            System.out.println(w.entry.getDescription());
+            for(String key:tfidf.keySet()){
+                System.out.print(" "+key+" ");
+                System.out.print(tfidf.get(key));
+            }
+            System.out.print("\n---------------------\n");
+        }
+
+        return res_sub;
+    }
+
     public static void main(String[] args) throws Exception{
         Search handle = new Search();
         String query = "cluster gene";
+        //ArrayList<WeightedAbs> res = handle.getMostSimilarAbstract(query,10);
         ArrayList<WeightedEntry> res = handle.getMostSimilarEntriesToQuery(query,10);
-        for (WeightedEntry r:res){
-            System.out.print(r.weight);
-            System.out.println(r.entry.getDescription());
-        }
+//        for (WeightedEntry r:res){
+//            System.out.print(r.weight);
+//            System.out.println(r.entry.getDescription());
+//        }
     }
 
 }

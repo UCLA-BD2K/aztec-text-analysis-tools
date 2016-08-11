@@ -121,7 +121,7 @@ public class KeywordsRank {
 
     public List<RankedString> topRankedKeywords() {
         LinkedList<RankedString> res = new LinkedList<>();
-        double minRank = rank[ordered[0]] * 0.9;
+        double minRank = (rank[ordered[0]]-rank[ordered[ordered.length-1]]) * 0.2+rank[ordered[ordered.length-1]];// change from 0.9 to 0.6
         int i = 0;
         while (i < ordered.length && rank[ordered[i]] >= minRank) {
             res.add(new RankedString(keywords.get(ordered[i]), rank[ordered[i]]));
@@ -151,7 +151,7 @@ public class KeywordsRank {
                 +"By facilitating frequent reanalysis of data and reducing the need to optimize parameters, "
                 +"Sailfish exemplifies the potential of lightweight algorithms for efficiently processing sequencing reads.\n";
         KeywordsRank kr = new KeywordsRank(test, 10);
-        List<RankedString> kw = kr.topRankedKeywords(10);
+        List<RankedString> kw = kr.topRankedKeywords();
         for (RankedString s : kw) {
             System.out.println(s);
         }

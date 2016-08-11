@@ -3,12 +3,10 @@ package edu.ucla.cs.scai.aztec.summarization;
 import edu.ucla.cs.scai.aztec.keyphrase.Tokenizer;
 import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
 import edu.ucla.cs.scai.aztec.AztecEntry;
+import edu.ucla.cs.scai.aztec.AbsEntry;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.extjwnl.JWNLException;
@@ -55,27 +53,40 @@ public class KeywordsBuilder {
         return res;
     }
 
-    public HashMap<String, List<RankedString>> buildKeywordsTest(String infile, String outputPath) throws IOException {
+    public HashMap<String, List<RankedString>> buildKeywordsAbstract(Collection<AbsEntry> entries, String outputPath) throws IOException {
         // The one I am currently using.
         // input contains all the sbatracts and description
 
         HashMap<String, List<RankedString>> res = new HashMap<>();
-        BufferedReader reader = new BufferedReader(new FileReader(infile));
-        String line;
-        Integer id = 0;
-        while((line = reader.readLine()) != null){
+        //BufferedReader reader = new BufferedReader(new FileReader(infile));
+        //String line;
+        //Integer id = 0;
+//        while((line = reader.readLine()) != null){
+//            LinkedList<RankedString> l = new LinkedList<>();
+//            res.put(Integer.toString(id), l);
+//            if (line.trim().length() > 0) {
+//                try {
+//                    KeywordsRank kr = new KeywordsRank(line.trim(), 10);
+//                    l.addAll(kr.topRankedKeywords());
+//                    //System.out.println(entry.getDescription() + " -> " + l);
+//                } catch (Exception ex) {
+//                    Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//            id ++;
+//        }
+        for (AbsEntry entry : entries) {
             LinkedList<RankedString> l = new LinkedList<>();
-            res.put(Integer.toString(id), l);
-            if (line.trim().length() > 0) {
+            res.put(entry.getId(), l);
+            if (entry.getDescription() != null && entry.getDescription().trim().length() > 0) {
                 try {
-                    KeywordsRank kr = new KeywordsRank(line.trim(), 10);
-                    l.addAll(kr.topRankedKeywords(20));
+                    KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
+                    l.addAll(kr.topRankedKeywords());
                     //System.out.println(entry.getDescription() + " -> " + l);
                 } catch (Exception ex) {
                     Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            id ++;
         }
 
         System.out.println("Writing keywords to file " + outputPath);
@@ -88,10 +99,10 @@ public class KeywordsBuilder {
         return res;
     }
 
-//    public static void main (String[] args)throws IOException, JWNLException{
-//        String infile = "src/main/data/abstract_removeurl.txt";
-//        String outfile = "src/main/data/textrank.data";
-//        KeywordsBuilder KB = new KeywordsBuilder();
-//        HashMap<String, List<RankedString>> res = KB.buildKeywordsTest(infile,outfile);
-//    }
+    public static void main (String[] args)throws IOException, JWNLException{
+        String infile = "src/main/data/abstract_removeurl.txt";
+        String outfile = "src/main/data/absKeywords_0.9.data";
+        KeywordsBuilder KB = new KeywordsBuilder();
+        //HashMap<String, List<RankedString>> res = KB.buildKeywordsAbstract(infile,outfile);
+    }
 }

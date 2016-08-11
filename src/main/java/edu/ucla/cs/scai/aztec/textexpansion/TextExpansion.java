@@ -17,8 +17,9 @@ import java.util.AbstractMap.SimpleEntry;
 public class TextExpansion {
     private final static HashSet<String> phraseList = new HashSet<>();
     private static Double confidence = 0.5;  // confidence of similar words
-    private static Double conf_phrase = 0.5;
-    private static Double min_sim = 0.7;
+    private static Double conf_phrase = 0.8; // confidence of sub words in phrase
+    private static Double min_sim = 0.7;  // min similarity score to be considered
+    private static Integer max_num = 10; // max similar units to be considered
     private final static Map<String, List<RankedString>> similarity = new HashMap<>();
 
 
@@ -50,26 +51,38 @@ public class TextExpansion {
         }
         reader.close();
     }
+    public TextExpansion() throws IOException{
+        this.loadMap("src/main/data/SimilarityFile.txt");
+    }
 
     public LinkedList<RankedString> queryExpansion (List<String> tokenQuery) throws IOException, JWNLException{
         //input format: [unit1,unit2,...]
         // if change to [<unit1,1.0>,<unit2 ,1.0> ... then we can use the same expansion function as document.
-        this.loadMap("src/main/data/SimilarityFile.txt");
+        //this.loadMap("src/main/data/SimilarityFile.txt");
         LinkedList<RankedString> expendedUnits = new LinkedList<>();
         List<RankedString> simList;
         Double querylen = 0.0;
         for(String unit: tokenQuery){
             expendedUnits.add(new RankedString(unit, 1.0));
             String[] winphrase = unit.split("_");
-            for (String w :winphrase){ // only do this for origin units
-                Double w_score = 1.0 *conf_phrase;
-                expendedUnits.add(new RankedString(w, w_score));
+            if(winphrase.length>= 2) {
+                for (String w : winphrase) { // only do this for origin units
+                    Double w_score = 1.0 * conf_phrase;
+                    expendedUnits.add(new RankedString(w, w_score));
+                }
             }
-            simList = similarity.get(unit);
-            for(RankedString simUnit:simList){ // only do this for origin units
-                if(simUnit.getRank()>min_sim) {
-                    simUnit.setRank(simUnit.getRank() * confidence);
-                    expendedUnits.add(simUnit);
+            simList = similarity.get(unit); // only do this for origin tokens
+            Integer sim_num = 0;
+            if(simList != null) {
+                for (RankedString simUnit : simList) {
+                    if (sim_num>=max_num) {
+                        break;
+                    }
+                    if(simUnit.getRank()>min_sim) {
+                        simUnit.setRank(simUnit.getRank() * confidence);
+                        expendedUnits.add(simUnit);
+                        sim_num +=1;
+                    }
                 }
             }
         }
@@ -77,7 +90,7 @@ public class TextExpansion {
     }
 
     public List<RankedString> docExpansion (List<RankedString> textrank) throws JWNLException, IOException{
-        this.loadMap("src/main/data/SimilarityFile.txt");
+        //this.loadMap("src/main/data/SimilarityFile.txt");
         // input format: [<unit1,score1>,<unit2,score2>...]
         List<RankedString> expendedUnits = new ArrayList<>();
         List<RankedString> simList;
@@ -86,15 +99,24 @@ public class TextExpansion {
             String unit = unit_score.getString();
             Double score = unit_score.getRank();
             String[] winphrase = unit.split("_");
-            for (String w :winphrase){ // only do this for origin units
-                Double w_score = score *conf_phrase;
-                expendedUnits.add(new RankedString(w, w_score));
+            if (winphrase.length >=2) {
+                for (String w : winphrase) { // only do this for origin units
+                    Double w_score = score * conf_phrase;
+                    expendedUnits.add(new RankedString(w, w_score));
+                }
             }
+            Integer sim_num = 0;
             simList = similarity.get(unit);
             if(simList != null) {
                 for (RankedString simUnit : simList) {
-                    simUnit.setRank(score * simUnit.getRank() * confidence);
-                    expendedUnits.add(simUnit);
+                    if (sim_num>=max_num) {
+                        break;
+                    }
+                    if(simUnit.getRank()>min_sim) {
+                        simUnit.setRank(simUnit.getRank() * confidence);
+                        expendedUnits.add(simUnit);
+                        sim_num +=1;
+                    }
                 }
             }
         }
@@ -130,10 +152,6 @@ public class TextExpansion {
 //        return units;
 //    }
 
-    public List<Entry<String,Double>> Expansion(String unit) throws JWNLException, FileNotFoundException{
-        List<Entry<String,Double>> simUnits = new ArrayList<Entry<String,Double>>();
-        return simUnits;
-    }
 //    public List<RankedString> queryExpansion(String query) throws JWNLException, FileNotFoundException {
 //        TextExpansion te = new TextExpansion();
 //        List<RankedString> expQuery = new ArrayList<RankedString>();

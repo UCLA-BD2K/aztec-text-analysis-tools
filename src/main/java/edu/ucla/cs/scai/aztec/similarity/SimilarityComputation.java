@@ -2,13 +2,9 @@ package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.summarization.RankedString;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.io.*;
+import java.util.*;
 
 /**
  *
@@ -17,9 +13,13 @@ import java.util.List;
 public class SimilarityComputation {
 
     Tokenizer tokenizer;
+    static HashMap<String, Double> documentLengthK;
+    static HashMap<String, HashMap<String, Double>> tfidtK;
+    static HashMap<String, Double> idfK;
+    static HashMap<String, String> AbsMap = new HashMap<>();
 
     public SimilarityComputation() throws Exception {
-        tokenizer = new Tokenizer();
+        //tokenizer = new Tokenizer();
     }
 
     public double getTagDistance(AztecEntry e1, AztecEntry e2) {
@@ -436,37 +436,119 @@ public class SimilarityComputation {
         }
         return s.substring(0, length) + "...";
     }
+    public ArrayList<RankedString> getMostSimilarAbstract(String id, Integer k){
+        ArrayList<RankedString> res= new ArrayList<>();
+        HashMap<String, Double> tfidf_id = tfidtK.get(id);
+        HashMap<String, Double> queryTfidt = new HashMap<>();
+        double queryLength = 0;
+        for (String w : tfidf_id.keySet()) {
+            Double val = idfK.get(w); // get idf
+            if (val != null) {
+                //val *= 1.0 * wordCount.get(w) / max;
+                // the calculation methods have problem, log(w) will get to 0
+                //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
+                val *= tfidf_id.get(w); // use the text score multiple the idf
+                queryLength += val * val;
+                queryTfidt.put(w, val);
+            }
+        }
+        for (String tid : tfidtK.keySet()) {
+            double docLength = documentLengthK.get(tid);
+            HashMap<String, Double> row = tfidtK.get(tid);
+            double sim = 0;
+            for (String w : tfidf_id.keySet()) {
+                Double val = row.get(w);
+                if (val != null) {
+                    sim += val * queryTfidt.get(w);
+                }
+            }
+            sim /= (queryLength * docLength); // calculate cos similarity
+            if (sim > 0) {
+                res.add(new RankedString(AbsMap.get(tid),sim));
+            }
+        }
+        Collections.sort(res);
+        if(res.size()>=5) {
+            ArrayList<RankedString> res_sub = new ArrayList<>(res.subList(0, k));
+            return res_sub;
+        }
+        else{
+            return res;
+        }
+    }
 
     public static void main(String[] args) throws Exception {
-        long start = System.currentTimeMillis();
-        SimilarityComputation sim = new SimilarityComputation();
-        for (AztecEntry e : CachedData.entryMap.values()) {
-            System.out.println("=======");
-            System.out.println(e.getId() + " " + e.getName() + ": " + truncate(e.getDescription(), 100));
-            System.out.println("Combining description and tags");
-            ArrayList<WeightedEntry> res = sim.getMostSimilarEntries(e, 5, true);
-            for (WeightedEntry we : res) {
-                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
-            }
-            System.out.println("Only description");
-            res = sim.getMostSimilarEntriesWithOnlyDescription(e, 5);
-            for (WeightedEntry we : res) {
-                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
-            }
-            System.out.println("Description and tags separately");
-            res = sim.getMostSimilarEntries(e, 5, 0.5, 0.5);
-            for (WeightedEntry we : res) {
-                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
-            }
-            System.out.println("TFIDF computed on keywords obtained through TextRank");
-            res = sim.getMostSimilarEntriesWithOnlyKeywordsTFIDF(e, 5, 0.2);
-            for (WeightedEntry we : res) {
-                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
-            }
+        SimilarityComputation SC = new SimilarityComputation();
+        String infile = "src/main/data/abstfidf.data";
+        String outfile = "src/main/data/simlarabstract.txt";
+        PrintWriter outString = new PrintWriter(outfile);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(infile));
+        documentLengthK = (HashMap<String, Double>) ois.readObject();
+        tfidtK = (HashMap<String, HashMap<String, Double>>) ois.readObject();
+        idfK = (HashMap<String, Double>) ois.readObject();
+        BufferedReader reader = new BufferedReader(new FileReader("src/main/data/abstract_removeurl.txt"));
 
+        Integer i = 0;
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.trim().length() > 0) {
+                try {
+                    AbsMap.put(Integer.toString(i), line.trim());
+                }catch(NullPointerException e){
+                    System.out.print(i);
+                    System.out.println(line);
+                }
+            }
+            i += 1;
         }
-        long end = System.currentTimeMillis();
-        long sec = (end - start) / 1000;
-        System.out.println("Running time: " + (sec / 60) + "'" + (sec % 60) + "\"");
+
+        System.out.println("Start to generate");
+        Integer count = 0;
+        ArrayList<RankedString> res = new ArrayList<RankedString>();
+        for(String id : tfidtK.keySet()){
+            res = SC.getMostSimilarAbstract(id,5);
+            outString.println(id+":"+AbsMap.get(id));
+            for (RankedString r:res){
+                outString.print(Double.toString(r.getRank())+" ");
+                outString.println(r.getString());
+            }
+            outString.println("---------------");
+            count+=1;
+            if (count%1000 == 0){
+                System.out.println(count);
+            }
+        }
+        outString.close();
+
+//        long start = System.currentTimeMillis();
+//        SimilarityComputation sim = new SimilarityComputation();
+//        for (AztecEntry e : CachedData.entryMap.values()) {
+//            System.out.println("=======");
+//            System.out.println(e.getId() + " " + e.getName() + ": " + truncate(e.getDescription(), 100));
+//            System.out.println("Combining description and tags");
+//            ArrayList<WeightedEntry> res = sim.getMostSimilarEntries(e, 5, true);
+//            for (WeightedEntry we : res) {
+//                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+//            }
+//            System.out.println("Only description");
+//            res = sim.getMostSimilarEntriesWithOnlyDescription(e, 5);
+//            for (WeightedEntry we : res) {
+//                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+//            }
+//            System.out.println("Description and tags separately");
+//            res = sim.getMostSimilarEntries(e, 5, 0.5, 0.5);
+//            for (WeightedEntry we : res) {
+//                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+//            }
+//            System.out.println("TFIDF computed on keywords obtained through TextRank");
+//            res = sim.getMostSimilarEntriesWithOnlyKeywordsTFIDF(e, 5, 0.2);
+//            for (WeightedEntry we : res) {
+//                System.out.println(we.weight + " " + we.entry.getId() + " " + we.entry.getName() + ": " + truncate(we.entry.getDescription(), 100));
+//            }
+//
+//        }
+//        long end = System.currentTimeMillis();
+//        long sec = (end - start) / 1000;
+//        System.out.println("Running time: " + (sec / 60) + "'" + (sec % 60) + "\"");
     }
 }

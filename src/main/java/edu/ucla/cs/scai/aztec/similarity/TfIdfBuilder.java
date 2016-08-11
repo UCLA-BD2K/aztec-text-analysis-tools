@@ -66,7 +66,7 @@ public class TfIdfBuilder {
             tfidt.put(entry, row);
             double length = 0;
             for (String w : wordCount.keySet()) {
-                double val = (1 + Math.log(wordCount.get(w)) / log2) * idf.get(w);
+                double val = (1 + Math.log(wordCount.get(w)) / log2);
                 row.put(w, val);
                 length += val * val;
             }
