@@ -147,8 +147,8 @@ public class Search {
                     sim += val * queryTfidt.get(w);
                 }
             }
-            sim /= (queryLength * docLength); // calculate cos similarity
-            //sim /=(queryLength);
+            //sim /= (queryLength * docLength); // calculate cos similarity
+            sim /=(queryLength);
             if (sim > 0) {
                 res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
             }

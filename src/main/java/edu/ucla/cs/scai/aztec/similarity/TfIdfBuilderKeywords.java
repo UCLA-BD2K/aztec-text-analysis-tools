@@ -85,7 +85,7 @@ public class TfIdfBuilderKeywords {
                 if (colLength == null) {
                     colLength = 0d;
                 }
-                colLength += val * val;
+                colLength += val;
                 columnLengths.put(w, colLength);
                 if(val>max_s){
                     max_s = val;
@@ -99,9 +99,9 @@ public class TfIdfBuilderKeywords {
             row_min.put(entry,min_s);
         }
 
-        for (Map.Entry<String, Double> e : columnLengths.entrySet()) {
-            e.setValue(Math.sqrt(e.getValue())); // do sqrt later
-        }
+//        for (Map.Entry<String, Double> e : columnLengths.entrySet()) {
+//            e.setValue(Math.sqrt(e.getValue())); // do sqrt later
+//        }
 
         //now divide each cell by the length of its column
         //and compute the length of the document
@@ -113,7 +113,7 @@ public class TfIdfBuilderKeywords {
             for (Map.Entry<String, Double> e : row.entrySet()) {
                 Double value = e.getValue(); // / columnLengths.get(e.getKey());
                 //value = (value-min_score)/(max_score-min_score);
-                value = 0.5+0.5*value/max_score;
+                //value = 0.5+0.5*value/max_score;
                 value *= idf.get(e.getKey());
                 e.setValue(value); // normalize each column already involve a kind of idf
                 length += e.getValue() * e.getValue();

@@ -17,6 +17,7 @@ import java.util.AbstractMap.SimpleEntry;
 public class TextExpansion {
     private final static HashSet<String> phraseList = new HashSet<>();
     private static Double confidence = 0.5;  // confidence of similar words
+    private static Double sum_conf = 2.0; // total similar word weight = 2.0*original word weight
     private static Double conf_phrase = 0.8; // confidence of sub words in phrase
     private static Double min_sim = 0.7;  // min similarity score to be considered
     private static Integer max_num = 10; // max similar units to be considered
@@ -63,6 +64,7 @@ public class TextExpansion {
         List<RankedString> simList;
         Double querylen = 0.0;
         for(String unit: tokenQuery){
+            LinkedList<RankedString> tmpunits = new LinkedList<>();
             expendedUnits.add(new RankedString(unit, 1.0));
             String[] winphrase = unit.split("_");
             if(winphrase.length>= 2) {
@@ -73,6 +75,7 @@ public class TextExpansion {
             }
             simList = similarity.get(unit); // only do this for origin tokens
             Integer sim_num = 0;
+            Double sum_weight = 0.0;
             if(simList != null) {
                 for (RankedString simUnit : simList) {
                     if (sim_num>=max_num) {
@@ -80,9 +83,14 @@ public class TextExpansion {
                     }
                     if(simUnit.getRank()>min_sim) {
                         simUnit.setRank(simUnit.getRank() * confidence);
-                        expendedUnits.add(simUnit);
+                        tmpunits.add(simUnit);
                         sim_num +=1;
+                        sum_weight += simUnit.getRank();
                     }
+                }
+                for (RankedString simUnit:tmpunits){
+                    simUnit.setRank(simUnit.getRank() * 1.0 * sum_conf / sum_weight);
+                    expendedUnits.add(simUnit);
                 }
             }
         }
@@ -95,6 +103,7 @@ public class TextExpansion {
         List<RankedString> expendedUnits = new ArrayList<>();
         List<RankedString> simList;
         for(RankedString unit_score: textrank){
+            LinkedList<RankedString> tmpunits = new LinkedList<>();
             expendedUnits.add(unit_score);
             String unit = unit_score.getString();
             Double score = unit_score.getRank();
@@ -107,6 +116,7 @@ public class TextExpansion {
             }
             Integer sim_num = 0;
             simList = similarity.get(unit);
+            Double sum_weight = 0.0;
             if(simList != null) {
                 for (RankedString simUnit : simList) {
                     if (sim_num>=max_num) {
@@ -114,9 +124,14 @@ public class TextExpansion {
                     }
                     if(simUnit.getRank()>min_sim) {
                         simUnit.setRank(simUnit.getRank() * confidence);
-                        expendedUnits.add(simUnit);
+                        tmpunits.add(simUnit);
                         sim_num +=1;
+                        sum_weight += simUnit.getRank();
                     }
+                }
+                for (RankedString simUnit: tmpunits){
+                    simUnit.setRank(simUnit.getRank() * score * sum_conf/ sum_weight);
+                    expendedUnits.add(simUnit);
                 }
             }
         }
@@ -166,24 +181,25 @@ public class TextExpansion {
 
     public static void main(String[] args) throws IOException, JWNLException, ClassNotFoundException{
         TextExpansion TE = new TextExpansion();
+        TextParser TP = new TextParser();
         String infile = "src/main/data/SimilarityFile.txt";
         TE.loadMap(infile);
-//        String test = "rna-seq";
-//        List<String> pq = TP.queryParser(test);
-//        List<RankedString> expendTest = TE.queryExpansion(pq);
-//        for (RankedString rs : expendTest ){
-//            System.out.println(rs);
+        String test = "cluster gene";
+        List<String> pq = TP.queryParser(test);
+        List<RankedString> expendTest = TE.queryExpansion(pq);
+        for (RankedString rs : expendTest ){
+            System.out.println(rs);
+        }
+//        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/main/data/textrank.data"));
+//        HashMap<String, List<RankedString>> keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+//        HashMap<String, List<RankedString>> expendedKeywords = new HashMap<>();
+//        for (String id : keywords.keySet()){
+//            List<RankedString> rankedToken = keywords.get(id);
+//            List<RankedString> expendedToken = TE.docExpansion(rankedToken);
+//            expendedKeywords.put(id,expendedToken);
 //        }
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/main/data/textrank.data"));
-        HashMap<String, List<RankedString>> keywords = (HashMap<String, List<RankedString>>) ois.readObject();
-        HashMap<String, List<RankedString>> expendedKeywords = new HashMap<>();
-        for (String id : keywords.keySet()){
-            List<RankedString> rankedToken = keywords.get(id);
-            List<RankedString> expendedToken = TE.docExpansion(rankedToken);
-            expendedKeywords.put(id,expendedToken);
-        }
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("src/main/data/expendedKeywords.data"))) {
-            out.writeObject(expendedKeywords);
-        }
+//        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("src/main/data/expendedKeywords.data"))) {
+//            out.writeObject(expendedKeywords);
+//        }
     }
 }

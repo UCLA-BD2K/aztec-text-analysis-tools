@@ -2,18 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1d4b8583-6975-48bb-8e2d-4e0a5f0da88b" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/AbsEntry.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/AbsCachedData.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/WeightedAbs.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/data/expkeywords.data" afterPath="$PROJECT_DIR$/src/main/data/expkeywords.data" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/data/tfidfk.data" afterPath="$PROJECT_DIR$/src/main/data/tfidfk.data" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/CachedData.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/CachedData.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/Search.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/Search.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/SimilarityComputation.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/SimilarityComputation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilder.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/ExpandedKeywordsBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/ExpandedKeywordsBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsRank.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsRank.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/textexpansion/TextExpansion.java" afterPath="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/textexpansion/TextExpansion.java" />
     </list>
     <ignored path="TextSimilarity.iws" />
@@ -40,8 +33,8 @@
       <file leaf-file-name="TextExpansion.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/textexpansion/TextExpansion.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+            <state relative-caret-position="-714">
+              <caret line="133" column="47" selection-start-line="133" selection-start-column="47" selection-end-line="133" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -84,8 +77,8 @@
       <file leaf-file-name="Search.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/Search.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1808">
-              <caret line="160" column="43" selection-start-line="160" selection-start-column="43" selection-end-line="160" selection-end-column="43" />
+            <state relative-caret-position="368">
+              <caret line="150" column="12" selection-start-line="150" selection-start-column="12" selection-end-line="150" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -150,8 +143,8 @@
       <file leaf-file-name="TfIdfBuilderKeywords.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-278">
-              <caret line="80" column="49" selection-start-line="80" selection-start-column="49" selection-end-line="80" selection-end-column="49" />
+            <state relative-caret-position="28">
+              <caret line="118" column="47" selection-start-line="118" selection-start-column="47" selection-end-line="118" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -197,8 +190,8 @@
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/WeightedAbs.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/AbsCachedData.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsRank.java" />
-        <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/KeywordsBuilder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/textexpansion/TextExpansion.java" />
         <option value="$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/Search.java" />
       </list>
@@ -722,26 +715,6 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="ExpandedKeywordsBuilder" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="edu.ucla.cs.scai.aztec.summarization.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="MAIN_CLASS_NAME" value="edu.ucla.cs.scai.aztec.summarization.ExpandedKeywordsBuilder" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="TextSimilarity" />
-      <envs />
-      <method />
-    </configuration>
     <configuration default="false" name="SimilarityComputation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -770,6 +743,26 @@
         </pattern>
       </extension>
       <option name="MAIN_CLASS_NAME" value="edu.ucla.cs.scai.aztec.summarization.KeywordsRank" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="TextSimilarity" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="TextExpansion" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="edu.ucla.cs.scai.aztec.textexpansion.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="MAIN_CLASS_NAME" value="edu.ucla.cs.scai.aztec.textexpansion.TextExpansion" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -1205,17 +1198,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.TfIdfBuilderKeywords" />
       <item index="1" class="java.lang.String" itemvalue="Application.Search" />
-      <item index="2" class="java.lang.String" itemvalue="Application.ExpandedKeywordsBuilder" />
-      <item index="3" class="java.lang.String" itemvalue="Application.SimilarityComputation" />
-      <item index="4" class="java.lang.String" itemvalue="Application.KeywordsRank" />
+      <item index="2" class="java.lang.String" itemvalue="Application.SimilarityComputation" />
+      <item index="3" class="java.lang.String" itemvalue="Application.KeywordsRank" />
+      <item index="4" class="java.lang.String" itemvalue="Application.TextExpansion" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Application.Search" />
-        <item index="1" class="java.lang.String" itemvalue="Application.KeywordsRank" />
-        <item index="2" class="java.lang.String" itemvalue="Application.SimilarityComputation" />
-        <item index="3" class="java.lang.String" itemvalue="Application.TfIdfBuilderKeywords" />
-        <item index="4" class="java.lang.String" itemvalue="Application.ExpandedKeywordsBuilder" />
+        <item index="1" class="java.lang.String" itemvalue="Application.TextExpansion" />
+        <item index="2" class="java.lang.String" itemvalue="Application.KeywordsRank" />
+        <item index="3" class="java.lang.String" itemvalue="Application.SimilarityComputation" />
+        <item index="4" class="java.lang.String" itemvalue="Application.TfIdfBuilderKeywords" />
       </list>
     </recent_temporary>
   </component>
@@ -1241,16 +1234,16 @@
       <workItem from="1470763157669" duration="6156000" />
       <workItem from="1470786948688" duration="4332000" />
       <workItem from="1470856829469" duration="24514000" />
-      <workItem from="1470934205212" duration="15722000" />
+      <workItem from="1470934205212" duration="19033000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160296000" />
+    <option name="totallyTimeSpent" value="163607000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1616" height="916" extended-state="7" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1616" height="916" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -1259,7 +1252,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32961586" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32961586" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1292,7 +1285,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="81" />
+      <option name="time" value="82" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -1731,38 +1724,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/AztecEntry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1253">
-          <caret line="49" column="5" selection-start-line="43" selection-start-column="4" selection-end-line="49" selection-end-column="5" />
-          <folding>
-            <element signature="e#1071#1072#0" expanded="true" />
-            <element signature="e#1117#1118#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/AbsEntry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding>
-            <element signature="e#479#480#0" expanded="true" />
-            <element signature="e#525#526#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-278">
-          <caret line="80" column="49" selection-start-line="80" selection-start-column="49" selection-end-line="80" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/CachedData.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
@@ -1789,6 +1750,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/TfIdfBuilderKeywords.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="118" column="47" selection-start-line="118" selection-start-column="47" selection-end-line="118" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/AztecEntry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1253">
+          <caret line="49" column="5" selection-start-line="43" selection-start-column="4" selection-end-line="49" selection-end-column="5" />
+          <folding>
+            <element signature="e#1071#1072#0" expanded="true" />
+            <element signature="e#1117#1118#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/AbsEntry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding>
+            <element signature="e#479#480#0" expanded="true" />
+            <element signature="e#525#526#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/summarization/ExpandedKeywordsBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
@@ -1801,16 +1794,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/textexpansion/TextExpansion.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        <state relative-caret-position="-714">
+          <caret line="133" column="47" selection-start-line="133" selection-start-column="47" selection-end-line="133" selection-end-column="47" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/edu/ucla/cs/scai/aztec/similarity/Search.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1808">
-          <caret line="160" column="43" selection-start-line="160" selection-start-column="43" selection-end-line="160" selection-end-column="43" />
+        <state relative-caret-position="368">
+          <caret line="150" column="12" selection-start-line="150" selection-start-column="12" selection-end-line="150" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
