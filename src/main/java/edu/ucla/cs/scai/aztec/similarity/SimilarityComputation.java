@@ -462,7 +462,8 @@ public class SimilarityComputation {
                     sim += val * queryTfidt.get(w);
                 }
             }
-            sim /= (queryLength * docLength); // calculate cos similarity
+            //sim /= (queryLength * docLength); // calculate cos similarity
+            sim /= queryLength; // doesn't matter equally to every document for each data
             if (sim > 0) {
                 res.add(new RankedString(AbsMap.get(tid),sim));
             }
@@ -476,11 +477,51 @@ public class SimilarityComputation {
             return res;
         }
     }
-
-    public static void main(String[] args) throws Exception {
+    public ArrayList<WeightedEntry> getMostSimilarAztecEntries(String id, Integer k){
+        ArrayList<WeightedEntry> res= new ArrayList<>();
+        HashMap<String, Double> tfidf_id = CachedData.tfidtK.get(id);
+        HashMap<String, Double> queryTfidt = new HashMap<>();
+        double queryLength = 0;
+        for (String w : tfidf_id.keySet()) {
+            Double val = CachedData.idfK.get(w); // get idf
+            if (val != null) {
+                //val *= 1.0 * wordCount.get(w) / max;
+                // the calculation methods have problem, log(w) will get to 0
+                //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
+                val *= tfidf_id.get(w); // use the text score multiple the idf
+                queryLength += val * val;
+                queryTfidt.put(w, val);
+            }
+        }
+        for (String entry : CachedData.tfidtK.keySet()) {
+            double docLength = CachedData.documentLengthK.get(entry);
+            HashMap<String, Double> row = CachedData.tfidtK.get(entry);
+            double sim = 0;
+            for (String w : tfidf_id.keySet()) {
+                Double val = row.get(w);
+                if (val != null) {
+                    sim += val * queryTfidt.get(w);
+                }
+            }
+            //sim /= (queryLength * docLength); // calculate cos similarity
+            sim /= docLength; // doesn't matter equally to every document for each data
+            if (sim > 0) {
+                res.add(new WeightedEntry(CachedData.entryMap.get(entry), sim));
+            }
+        }
+        Collections.sort(res);
+        if(res.size()>=k) {
+            ArrayList<WeightedEntry> res_sub = new ArrayList<>(res.subList(0, k));
+            return res_sub;
+        }
+        else{
+            return res;
+        }
+    }
+    public void getMostSimilarAbstractForAllAbs() throws Exception{
         SimilarityComputation SC = new SimilarityComputation();
-        String infile = "src/main/data/abstfidf.data";
-        String outfile = "src/main/data/simlarabstract.txt";
+        String infile = "src/main/data/tfidfk.data";
+        String outfile = "src/main/data/simlarentry.txt";
         PrintWriter outString = new PrintWriter(outfile);
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(infile));
         documentLengthK = (HashMap<String, Double>) ois.readObject();
@@ -519,6 +560,46 @@ public class SimilarityComputation {
             }
         }
         outString.close();
+        reader.close();
+    }
+    public void getMostSimilarEntriesForAllEntries() throws Exception{
+        SimilarityComputation SC = new SimilarityComputation();
+//        String infile = "src/main/data/tfidfk.data";
+        String outfile = "src/main/data/simlarentry3.txt";
+        PrintWriter outString = new PrintWriter(outfile);
+//        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(infile));
+//        documentLengthK = (HashMap<String, Double>) ois.readObject();
+//        tfidtK = (HashMap<String, HashMap<String, Double>>) ois.readObject();
+//        idfK = (HashMap<String, Double>) ois.readObject();
+        System.out.println("Start to generate");
+        Integer count = 0;
+        ArrayList<WeightedEntry> res = new ArrayList<>();
+        for(String id : CachedData.tfidtK.keySet()){
+            res = SC.getMostSimilarAztecEntries(id,6);
+            outString.println(id+":"+CachedData.entryMap.get(id).getDescription());
+            for (WeightedEntry r:res){
+                outString.print(Double.toString(r.weight)+"\t");
+                outString.println(r.entry.getId()+"\t"+r.entry.getDescription()+"\t"+r.entry.getDomains());
+            }
+            outString.println("---------------");
+            count+=1;
+            if (count%1000 == 0){
+                System.out.println(count);
+            }
+        }
+        outString.close();
+        //reader.close();
+    }
+
+    public static void main(String[] args) throws Exception {
+        SimilarityComputation SC = new SimilarityComputation();
+        SC.getMostSimilarEntriesForAllEntries();
+//        SC.getMostSimilarAztecEntries("5816",6);
+//        ArrayList<WeightedEntry> res = new ArrayList<>();
+//        for (WeightedEntry r:res){
+//            System.out.print(Double.toString(r.weight)+"\t");
+//            System.out.println(r.entry.getId()+"\t"+r.entry.getDescription()+"\t"+r.entry.getDomains());
+//        }
 
 //        long start = System.currentTimeMillis();
 //        SimilarityComputation sim = new SimilarityComputation();

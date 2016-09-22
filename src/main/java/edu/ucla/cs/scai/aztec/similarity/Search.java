@@ -10,10 +10,14 @@ import edu.ucla.cs.scai.aztec.textexpansion.TextExpansion;
 import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.dto.SearchResultPage;
+import jdk.nashorn.internal.ir.CatchNode;
 import net.sf.extjwnl.JWNLException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
+import java.lang.*;
 
 /**
  *
@@ -74,7 +78,7 @@ public class Search {
     }
 
     public ArrayList<WeightedEntry> getMostSimilarEntriesToQuery(String qs, int k) throws Exception{
-
+        PrintWriter pw = new PrintWriter(new FileOutputStream("src/main/data/search_result.txt"));
         ArrayList<WeightedEntry> res = new ArrayList<>();
         ArrayList<WeightedEntry> res_sub = new ArrayList<>();
         LinkedList<String> origintokens = new LinkedList<>();
@@ -106,11 +110,13 @@ public class Search {
             if (c == null) {
                 wordCount.put(w.getString(), w.getRank());
             } else {
+                //Double max_c = Math.max(c,w.getRank());
+                //wordCount.put(w.getString(), max_c);
                 wordCount.put(w.getString(), c + w.getRank());
             }
         }
         for(String w:wordCount.keySet()){
-            Double val = wordCount.get(w);
+            Double val = wordCount.get(w);//*CachedData.idfK.get(w);
             if(val>max_s){
                 max_s = val;
             }
@@ -126,12 +132,16 @@ public class Search {
             //val = (val-min_s)/(max_s-min_s); //do the min max scaler as the documents
             if (val != null) {
                 //val *= 1.0 * wordCount.get(w) / max;
+                val = val/max_s;
+                //val = val* CachedData.idfK.get(w);
                 // the calculation methods have problem, log(w) will get to 0
                 //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
                 queryLength += val * val;
                 queryTfidt.put(w, val);
                 System.out.print(" "+w+" ");
+                pw.print(" "+w+" ");
                 System.out.print(val);
+                pw.print(val);
             }
             System.out.print("\n");
         }
@@ -164,17 +174,27 @@ public class Search {
         for (WeightedEntry w: res_sub){
             HashMap<String,Double> tfidf = CachedData.tfidtK.get(w.entry.getId());
             System.out.print(w.weight);
+            System.out.print(w.weight);
+            pw.print(w.weight);
+            pw.print("\t");
             System.out.println(w.entry.getDescription());
+            pw.print(w.entry.getId()+": ");
+            pw.println(w.entry.getDescription());
+            pw.println(w.entry.getTags());
             for(String key:tfidf.keySet()){
                 System.out.print(" "+key+" ");
                 System.out.print(tfidf.get(key));
+                pw.print(" "+key+" ");
+                pw.print(tfidf.get(key));
             }
             System.out.print("\n---------------------\n");
+            pw.print("\n---------------------\n");
         }
-
+        pw.close();
         return res_sub;
     }
     public ArrayList<WeightedAbs> getMostSimilarAbstract(String qs, Integer k) throws JWNLException, IOException{
+        PrintWriter pw = new PrintWriter(new FileOutputStream("src/main/data/search_result.txt"));
         ArrayList<WeightedAbs> res = new ArrayList<>();
         ArrayList<WeightedAbs> res_sub = new ArrayList<>();
         LinkedList<String> origintokens = new LinkedList<>();
@@ -210,7 +230,7 @@ public class Search {
             }
         }
         for(String w:wordCount.keySet()){
-            Double val = wordCount.get(w);
+            Double val = wordCount.get(w)*AbsCachedData.idfK.get(w); // calculate the max score after multiple with idfk
             if(val>max_s){
                 max_s = val;
             }
@@ -225,6 +245,8 @@ public class Search {
             Double val = wordCount.get(w);
             //val = (val-min_s)/(max_s-min_s); //do the min max scaler as the documents
             if (val != null) {
+                val = val/max_s; //do the min max scaler as the documents
+                val *= AbsCachedData.idfK.get(w);
                 //val *= 1.0 * wordCount.get(w) / max;
                 // the calculation methods have problem, log(w) will get to 0
                 //val *= 1 + Math.log(wordCount.get(w)) / Math.log(2);
@@ -264,22 +286,31 @@ public class Search {
         for (WeightedAbs w: res_sub){
             HashMap<String,Double> tfidf = AbsCachedData.tfidtK.get(w.entry.getId());
             System.out.print(w.weight);
+            pw.print(w.weight);
+            pw.print("\t");
             System.out.println(w.entry.getDescription());
+
+            pw.print(w.entry.getId()+": ");
+            pw.println(w.entry.getDescription());
             for(String key:tfidf.keySet()){
                 System.out.print(" "+key+" ");
                 System.out.print(tfidf.get(key));
+                pw.print(" "+key+" ");
+                pw.print(tfidf.get(key));
             }
             System.out.print("\n---------------------\n");
+            pw.print("\n---------------------\n");
         }
+        pw.close();
 
         return res_sub;
     }
 
     public static void main(String[] args) throws Exception{
         Search handle = new Search();
-        String query = "cluster gene";
+        String query = "protein-protein interaction";
         //ArrayList<WeightedAbs> res = handle.getMostSimilarAbstract(query,10);
-        ArrayList<WeightedEntry> res = handle.getMostSimilarEntriesToQuery(query,10);
+        ArrayList<WeightedEntry> res = handle.getMostSimilarEntriesToQuery(query,50);
 //        for (WeightedEntry r:res){
 //            System.out.print(r.weight);
 //            System.out.println(r.entry.getDescription());

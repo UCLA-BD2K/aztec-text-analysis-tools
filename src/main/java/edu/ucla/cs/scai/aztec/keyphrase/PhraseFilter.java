@@ -22,9 +22,9 @@ public class PhraseFilter {
     LinkedList<String> phraseList3 = new LinkedList<>();
     Double threshold2_bot = 0.025;
     Double threshold2_up = 1.0;
-    Double min_sup2 = 5.0;
+    Double min_sup2 = 20.0;
     Double threshold3 = 0.0;
-    Double min_sup3 = 2.0;
+    Double min_sup3 = 20.0;
     Integer wordthreshold  = 4;
     Double t_threshold = 0.0;
     private final static HashSet<String> stopwords = new HashSet<>();
@@ -360,7 +360,7 @@ public class PhraseFilter {
         Integer linecount = 0;
         try{
             PrintWriter outString = new PrintWriter("src/main/data/invalid_phrase.txt");
-            PrintWriter outPhrase = new PrintWriter("src/main/data/phrase2List.txt");
+            PrintWriter outPhrase = new PrintWriter("src/main/data/phrase2List_20.txt");
             for ( String phrase : phraseCount.keySet() ) {
                 if (validPhrase(phrase)){
                     Double[] conf_sup;
@@ -403,7 +403,7 @@ public class PhraseFilter {
             properties.put(entry.getKey(), Double.toString(entry.getValue()));
         }
         try{
-            File fileOne=new File("src/main/data/phraseProbability_sup_5.0_c_min_0.025_max_1");
+            File fileOne=new File("src/main/data/phraseProbability_sup_20_c_min_0.025_max_1");
             FileOutputStream fos=new FileOutputStream(fileOne);
             properties.store(fos, null);
             fos.close();
@@ -415,7 +415,7 @@ public class PhraseFilter {
             properties.put(key, Double.toString(phraseCount.get(key)));
         }
         try{
-            File fileOne=new File("src/main/data/phraseFrequency_sup_5.0_c_min_0.025_max_1");
+            File fileOne=new File("src/main/data/phraseFrequency_sup_20_c_min_0.025_max_1");
             FileOutputStream fos=new FileOutputStream(fileOne);
             properties.store(fos, null);
             fos.close();
@@ -424,7 +424,7 @@ public class PhraseFilter {
         }
     }
     public void mergePhrase() throws IOException{
-        String infile = "src/main/data/phrase2List.txt";
+        String infile = "src/main/data/phrase2List_20.txt";
         BufferedReader br = new BufferedReader(new FileReader(infile));
         Map<String,HashSet<String>> phraseList2 = new HashMap<>();
         String line;
@@ -455,7 +455,7 @@ public class PhraseFilter {
 
     public void selectPhrase3() throws IOException{
         String infile = "src/main/data/phrase3Frequency";
-        String outfile = "src/main/data/phrase3List";
+        String outfile = "src/main/data/phrase3List_20";
         PrintWriter outString = new PrintWriter("src/main/data/invalid_phrase_3.txt");
         PrintWriter outPhrase = new PrintWriter(outfile);
         Properties properties = new Properties();
@@ -490,7 +490,7 @@ public class PhraseFilter {
     }
 
     public void writePhraseList() throws IOException{
-        String outfile = "src/main/data/phraseList.txt";
+        String outfile = "src/main/data/phraseList_20.txt";
         PrintWriter outString = new PrintWriter(outfile);
         for(String key:phraseProb.keySet()){
             outString.println(key);
@@ -503,7 +503,7 @@ public class PhraseFilter {
             properties.put(entry.getKey(), Double.toString(entry.getValue()));
         }
         try{
-            File fileOne=new File("src/main/data/phraseProbability_all");
+            File fileOne=new File("src/main/data/phraseProbability_all_20");
             FileOutputStream fos=new FileOutputStream(fileOne);
             properties.store(fos, null);
             fos.close();

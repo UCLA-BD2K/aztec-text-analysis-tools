@@ -6,26 +6,13 @@ import edu.ucla.cs.scai.aztec.summarization.KeywordsBuilder;
 import edu.ucla.cs.scai.aztec.summarization.RankedString;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
 public class TfIdfBuilderKeywords {
-    // copy from CachedData
-//    static HashMap<String, List<RankedString>> keywords;
-//
-//    private static void loadKeywords() throws Exception {
-//        System.out.println("Keywords path system property: " + System.getProperty("keywords.path"));
-//        String keywordsPath = System.getProperty("keywords.path", "src/main/data/expendedKeywords.data");
-//        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(keywordsPath));
-//        keywords = (HashMap<String, List<RankedString>>) ois.readObject();
-//    }
 
     static final double log2 = Math.log(2);
 
@@ -45,18 +32,52 @@ public class TfIdfBuilderKeywords {
                 if (c == null) {
                     wordCount.put(w.getString(), w.getRank());
                 } else {
+                      //Double max_c = Math.max(c,w.getRank());
+//                    wordCount.put(w.getString(), max_c);
                     wordCount.put(w.getString(), c + w.getRank());
                 }
             }
             // for each words, how many document contains the words.
 
             for (String w : wordCount.keySet()) {
+                // for origin units in the words list
                 Integer c = nOfDocsWithWord.get(w);
                 if (c == null) {
                     nOfDocsWithWord.put(w, 1);
                 } else {
                     nOfDocsWithWord.put(w, c + 1);
                 }
+                // new codes to calculate the idf of sub_phrases
+                String[] subwords = w.split("_");
+                Integer win_size = subwords.length-1;
+                while(win_size>1){
+                    Integer start_pos = 0;
+                    Integer end_pos = start_pos+win_size;
+                    while(end_pos<subwords.length){
+                        String[] subphrase = Arrays.copyOfRange(subwords, start_pos, end_pos);
+                        String sub_phrase = String.join("_",subphrase);
+                        c=nOfDocsWithWord.get(sub_phrase);
+                        if(c == null) {
+                            nOfDocsWithWord.put(sub_phrase, 1);
+                        }else{
+                            nOfDocsWithWord.put(sub_phrase, c+1);
+                        }
+                        start_pos++;
+                        end_pos = start_pos+win_size;
+                    }
+                    win_size --;
+                }
+                if(win_size == 1){
+                    for (String sub : subwords) { // only do this for origin units
+                        c = nOfDocsWithWord.get(sub);
+                        if(c == null) {
+                            nOfDocsWithWord.put(sub, 1);
+                        }else{
+                            nOfDocsWithWord.put(sub, c+1);
+                        }
+                    }
+                }
+                //////// end of new part
             }
         }
 
@@ -79,7 +100,7 @@ public class TfIdfBuilderKeywords {
             HashMap<String, Double> wordCount = fOfWordsInDocuments.get(entry);
             tfidt.put(entry, row);
             for (String w : wordCount.keySet()) {
-                double val = wordCount.get(w);//*idf.get(w); // do idf for documents do not do it again for query
+                double val = wordCount.get(w)*idf.get(w); // do idf for documents do not do it again for query
                 row.put(w, val);
                 Double colLength = columnLengths.get(w);
                 if (colLength == null) {
@@ -114,8 +135,9 @@ public class TfIdfBuilderKeywords {
                 Double value = e.getValue(); // / columnLengths.get(e.getKey());
                 //value = (value-min_score)/(max_score-min_score);
                 //value = 0.5+0.5*value/max_score;
+                value = value/max_score;
                 value *= idf.get(e.getKey());
-                e.setValue(value); // normalize each column already involve a kind of idf
+                //e.setValue(value); // normalize each column already involve a kind of idf
                 length += e.getValue() * e.getValue();
             }
             documentLength.put(entry, Math.sqrt(length));
@@ -148,9 +170,12 @@ public class TfIdfBuilderKeywords {
                 if (c == null) {
                     wordCount.put(w.getString(), w.getRank());
                 } else {
+//                    Double max_c = Math.max(c,w.getRank());
+//                    wordCount.put(w.getString(), max_c);
                     wordCount.put(w.getString(), c + w.getRank());
                 }
             }
+            // count how many documents contain a word
 
             for (String w : wordCount.keySet()) {
                 Integer c = nOfDocsWithWord.get(w);
@@ -159,6 +184,38 @@ public class TfIdfBuilderKeywords {
                 } else {
                     nOfDocsWithWord.put(w, c + 1);
                 }
+                // new codes to calculate the idf of sub_phrases
+                String[] subwords = w.split("_");
+                Integer win_size = subwords.length-1;
+                while(win_size>1){
+                    Integer start_pos = 0;
+                    Integer end_pos = start_pos+win_size;
+                    while(end_pos<subwords.length){
+                        String[] subphrase = Arrays.copyOfRange(subwords, start_pos, end_pos);
+                        String sub_phrase = String.join("_",subphrase);
+                        // in this case we do not check the subphrase is a real phrase or not, we just keep the record of it
+                        c=nOfDocsWithWord.get(sub_phrase);
+                        if(c == null) {
+                            nOfDocsWithWord.put(sub_phrase, 1);
+                        }else{
+                            nOfDocsWithWord.put(sub_phrase, c+1);
+                        }
+                        start_pos++;
+                        end_pos = start_pos+win_size;
+                    }
+                    win_size --;
+                }
+                if(win_size == 1){
+                    for (String sub : subwords) { // only do this for origin units
+                        c = nOfDocsWithWord.get(sub);
+                        if(c == null) {
+                            nOfDocsWithWord.put(sub, 1);
+                        }else{
+                            nOfDocsWithWord.put(sub, c+1);
+                        }
+                    }
+                }
+                //////// end of new part
             }
         }
 
@@ -212,9 +269,10 @@ public class TfIdfBuilderKeywords {
             Double max_score = row_max.get(entry);
             for (Map.Entry<String, Double> e : row.entrySet()) {
                 double val = e.getValue();
-                val = 0.5+0.5*val/max_score;
-                val *= idf.get(e.getKey());
-                e.setValue( val);
+//                val = 0.5+0.5*val/max_score;
+//                val *= idf.get(e.getKey());
+                val = val/max_score;
+                e.setValue(val);
                 //e.setValue( e.getValue()/ columnLengths.get(e.getKey())); // divide the column length here
                 length += e.getValue() * e.getValue();
             }

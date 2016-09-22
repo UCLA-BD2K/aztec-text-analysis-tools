@@ -12,14 +12,12 @@ import edu.stanford.nlp.util.PropertiesUtils;
 import net.sf.extjwnl.JWNLException;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 // need to map all the words to its lemma
 public class Tokenizer {
     StanfordCoreNLP pipelineTokens;
+
     public Tokenizer() throws JWNLException, FileNotFoundException {
         Properties propToken = new Properties();
         propToken.put("annotators","tokenize,ssplit,pos,lemma");
@@ -53,4 +51,5 @@ public class Tokenizer {
         }
         return wordList;
     }
+
 }

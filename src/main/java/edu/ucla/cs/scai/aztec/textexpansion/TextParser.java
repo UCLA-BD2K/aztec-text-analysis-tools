@@ -2,6 +2,7 @@ package edu.ucla.cs.scai.aztec.textexpansion;
 
 import com.sun.javaws.exceptions.JNLParseException;
 import edu.ucla.cs.scai.aztec.keyphrase.Tokenizer;
+//import edu.ucla.cs.scai.aztec.similarity.Tokenizer;
 import edu.ucla.cs.scai.aztec.utils.StringUtils;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.list.Node;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 public class TextParser{
     private final static HashSet<String> phraselist = new HashSet<>();
     private final static HashSet<String> stopwords = new HashSet<>();
+    private static Integer max_phrase = 5;
     static {
         String s = "a\n"
                 + "about\n"
@@ -214,12 +216,15 @@ public class TextParser{
         }
         reader.close();
     }
-    public LinkedList<String> queryParser(String text) throws JWNLException, IOException{
+    public TextParser() throws IOException{
+        this.loadData("src/main/data/phraseList_20.txt");
+    }
+    public LinkedList<String> queryParser_old(String text) throws JWNLException, IOException{
         LinkedList<String> unitList = new LinkedList<>();
-        String infile = "src/main/data/phraseList_5_0.1.txt";
+        //String infile = "src/main/data/phraseList_20.txt";
         //TextParser parser = new TextParser();
         Tokenizer token = new Tokenizer();
-        this.loadData(infile);
+        //this.loadData(infile);
         LinkedList<String> words = token.tokenize(text);
         String phrase;
         if(words.size()>1) {
@@ -264,6 +269,89 @@ public class TextParser{
         }
         return  unitList;
     }
+    public LinkedList<String> queryParser(String text) throws JWNLException, IOException{
+        LinkedList<String> unitList = new LinkedList<>();
+        //String infile = "src/main/data/phraseList_20.txt";
+        //TextParser parser = new TextParser();
+        Tokenizer token = new Tokenizer();
+        //this.loadData(infile);
+        LinkedList<String> words = token.tokenize(text);
+        ArrayList<String> next_words = new ArrayList<>();
+        String phrase;
+        Integer win_size = max_phrase;
+        //Integer this_length = words.size();
+        ArrayList<String> this_words = new ArrayList<>();
+        for(String w:words){
+            this_words.add(w);
+        }
+        while(win_size>=1){
+            Integer start_pos = 0;
+            Integer end_pos = start_pos+win_size-1;
+            while(end_pos<this_words.size()){
+                List<String>subphrase = this_words.subList(start_pos, end_pos+1);
+                String sub_phrase = String.join("_",subphrase);
+                if(phraselist.contains(sub_phrase)){
+                    next_words.add(sub_phrase);
+                    start_pos = end_pos+1;
+                }
+                else{
+                    next_words.add(this_words.get(start_pos));
+                    start_pos++;
+                }
+                end_pos = start_pos+win_size-1;
+            }
+            if(start_pos<this_words.size()) {
+                next_words.addAll(this_words.subList(start_pos, this_words.size()));
+            }
+            this_words = new ArrayList<>(next_words);
+            next_words = new ArrayList<>();
+            win_size--;
+        }
+        for(String w:this_words){
+            unitList.add(w);
+        }
+//        if(words.size()>1) {
+//            Integer final_idx = words.size() - 2;
+//            Integer i = 0;
+//            while(i < final_idx) {
+//                phrase = words.get(i)+"_"+words.get(i+1)+"_"+words.get(i+2); // first check three words phrase
+//                if(phraselist.contains(phrase)){
+//                    unitList.add((phrase));
+//                    i += 3; //skip all following words contained in phrase
+//                }
+//                else{
+//                    phrase = words.get(i)+"_"+words.get(i+1);
+//                    if (phraselist.contains(phrase)){
+//                        unitList.add(phrase);
+//                        i += 2;
+//                    }
+//                    else{
+//                        unitList.add(words.get(i));
+//                        i++;
+//                    }
+//                }
+//            }
+//            while(i<final_idx+1) { // check the last few words.
+//                phrase = words.get(i) + "_" + words.get(i + 1);
+//                if (phraselist.contains(phrase)) {
+//                    unitList.add(phrase);
+//                    i += 2;
+//                } else { // if not phrase, add as two separate words
+//                    unitList.add(words.get(i));
+//                    i++;
+//                }
+//            }
+//            while(i<final_idx+2){
+//                unitList.add(words.get(i));
+//                i++;
+//            }
+//
+//        }
+//        else{
+//            unitList.add(words.get(0));
+//        }
+        return  unitList;
+    }
 
     public LinkedList<String> docParser(String doc) throws JWNLException, IOException {
         LinkedList<String> unitList = new LinkedList<>();
@@ -277,7 +365,7 @@ public class TextParser{
         return  unitList;
     }
     public static void main(String[] args) throws JWNLException, IOException{
-        String test = "I am a test string, including term gene ontology";
+        String test = "X.org macros utilities.Tool Dependency Packages";
         TextParser TP = new TextParser();
         LinkedList<String> units = TP.docParser(test);
         System.out.print(units);

@@ -32,9 +32,9 @@ public class ParseSentence {
 
     public static void main(String[] args) throws IOException, JWNLException{
         TextParser TP = new TextParser();
-        String infile = "src/main/data/phraseList.txt";
+        String infile = "src/main/data/phraseList_Chi.txt";
         String senfile = "src/main/data/abstract_removeurl.txt";
-        String outfile = "src/main/data/parsedSentence_for_train.txt";
+        String outfile = "src/main/data/parsedSentence_for_train_Chi.txt";
         PrintWriter outString = new PrintWriter(outfile);
         ParseSentence parser = new ParseSentence();
         parser.loadData(infile);

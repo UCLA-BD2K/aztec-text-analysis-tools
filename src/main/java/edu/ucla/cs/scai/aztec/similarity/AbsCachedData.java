@@ -136,7 +136,7 @@ public class AbsCachedData {
             //tfidf data failed, try to reconstruct it
             try {
                 buildexpKeywords();
-                loadexpKeywords();
+                //loadexpKeywords();
             } catch (Exception ex2) {
                 Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
             }
@@ -149,7 +149,7 @@ public class AbsCachedData {
             //tfidf data failed, try to reconstruct it
             try {
                 buildTfidfKData();
-                loadTfidfKData();
+                //loadTfidfKData();
             } catch (Exception ex2) {
                 Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
             }

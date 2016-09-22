@@ -145,13 +145,15 @@ public class KeywordsRank {
     }
 
     public static void main(String[] args) throws JWNLException, FileNotFoundException, IOException{
-        String test = "We introduce Sailfish, a computational method for quantifying the abundance of previously annotated RNA isoforms from RNA-seq data. "
+        /*String test = "We introduce Sailfish, a computational method for quantifying the abundance of previously annotated RNA isoforms from RNA-seq data. "
                 +"Because Sailfish entirely avoids mapping reads, a time-consuming step in all current methods, "
                 +"it provides quantification estimates much faster than do existing approaches (typically 20 times faster) without loss of accuracy. "
                 +"By facilitating frequent reanalysis of data and reducing the need to optimize parameters, "
                 +"Sailfish exemplifies the potential of lightweight algorithms for efficiently processing sequencing reads.\n";
+                */
+        String test = "As a plugin for the Orthanc image store, allows viewing of Dicom images within a browser. Based on the GDCM Dicom library, and the Cornerstone Javascript library for rendering in a browser client";
         KeywordsRank kr = new KeywordsRank(test, 10);
-        List<RankedString> kw = kr.topRankedKeywords();
+        List<RankedString> kw = kr.topRankedKeywords(20);
         for (RankedString s : kw) {
             System.out.println(s);
         }

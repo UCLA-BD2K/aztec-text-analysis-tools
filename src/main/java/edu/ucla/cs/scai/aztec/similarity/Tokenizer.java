@@ -22,7 +22,7 @@ public class Tokenizer {
 
     //StanfordCoreNLP pipelineTree;
     StanfordCoreNLP pipelineTokens;
-    RepresentativeProvider representativeProvider;
+    //RepresentativeProvider representativeProvider;
 
     private final static HashSet<String> stopwords = new HashSet<>();
 
@@ -211,7 +211,7 @@ public class Tokenizer {
         //Properties propsTree = new Properties();
         //propsTree.put("annotators", "tokenize, ssplit, parse");
         //pipelineTree = new StanfordCoreNLP(propsTree);
-        representativeProvider = RepresentativeProvider.getInstance();
+        //representativeProvider = RepresentativeProvider.getInstance();
     }
     
     public LinkedList<String> tokenize(String text) {
@@ -226,10 +226,11 @@ public class Tokenizer {
                     String lemma = t.lemma();
                     String pos = t.tag();
                     if (!stopwords.contains(lemma)) {
-                        String rep = representativeProvider.getRepresentative(lemma, pos);
-                        if (!stopwords.contains(rep)) {
-                            res.add(rep);
-                        }
+                        res.add(lemma);
+                        //String rep = representativeProvider.getRepresentative(lemma, pos);
+//                        if (!stopwords.contains(rep)) {
+//                            res.add(rep);
+//                        }
                     }
                 }
             }
@@ -279,10 +280,10 @@ public class Tokenizer {
                     String lemma = t.lemma();
                     String pos = t.tag();
                     if (!stopwords.contains(lemma)) {
-                        String rep = representativeProvider.getRepresentative(lemma, pos);
-                        if (!stopwords.contains(rep)) {
-                            sentence.add(rep);
-                        }
+                        //String rep = representativeProvider.getRepresentative(lemma, pos);
+//                        if (!stopwords.contains(rep)) {
+//                            sentence.add(rep);
+//                        }
                     }
                 }
                 bounds[1]=last.endPosition();

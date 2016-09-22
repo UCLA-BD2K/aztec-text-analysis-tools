@@ -22,7 +22,7 @@ public class KeywordsBuilder {
 
     static final double log2 = Math.log(2);
 
-    public KeywordsBuilder() throws JWNLException, FileNotFoundException {
+    public KeywordsBuilder() throws JWNLException, FileNotFoundException, IOException {
         textparser = new TextParser();
     }
 
@@ -32,9 +32,20 @@ public class KeywordsBuilder {
         for (AztecEntry entry : entries) {
             LinkedList<RankedString> l = new LinkedList<>();
             res.put(entry.getId(), l);
-            if (entry.getDescription() != null && entry.getDescription().trim().length() > 0) {
+            if (entry.getDescription() != null && entry.getDescription().trim().length() > 0 && entry.getTags() !=null) {
+                try {
+                    KeywordsRank kr = new KeywordsRank(entry.getDescription()+" "+String.join(". ",entry.getTags()), 10);
+                    //KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
+                    l.addAll(kr.topRankedKeywords(20));
+                    //System.out.println(entry.getDescription() + " -> " + l);
+                } catch (Exception ex) {
+                    Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else if(entry.getDescription() != null && entry.getDescription().trim().length() > 0){
                 try {
                     KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
+                    //KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
                     l.addAll(kr.topRankedKeywords(20));
                     //System.out.println(entry.getDescription() + " -> " + l);
                 } catch (Exception ex) {
