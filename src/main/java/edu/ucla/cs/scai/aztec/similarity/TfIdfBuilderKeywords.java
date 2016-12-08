@@ -24,7 +24,7 @@ public class TfIdfBuilderKeywords {
         HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
         HashMap<String, HashMap<String, Double>> fOfWordsInDocuments = new HashMap<>();
         for (AztecEntry entry : entries) {
-            List<RankedString> rankedTokens = CachedData.expkeywords.get(entry.getId()); // change to expanded keywords as input
+            List<RankedString> rankedTokens = CachedData.keywords.get(entry.getId()); // change to expanded keywords as input
             HashMap<String, Double> wordCount = new HashMap<>();
             fOfWordsInDocuments.put(entry.getId(), wordCount);
             for (RankedString w : rankedTokens) {
@@ -48,35 +48,35 @@ public class TfIdfBuilderKeywords {
                     nOfDocsWithWord.put(w, c + 1);
                 }
                 // new codes to calculate the idf of sub_phrases
-                String[] subwords = w.split("_");
-                Integer win_size = subwords.length-1;
-                while(win_size>1){
-                    Integer start_pos = 0;
-                    Integer end_pos = start_pos+win_size;
-                    while(end_pos<subwords.length){
-                        String[] subphrase = Arrays.copyOfRange(subwords, start_pos, end_pos);
-                        String sub_phrase = String.join("_",subphrase);
-                        c=nOfDocsWithWord.get(sub_phrase);
-                        if(c == null) {
-                            nOfDocsWithWord.put(sub_phrase, 1);
-                        }else{
-                            nOfDocsWithWord.put(sub_phrase, c+1);
-                        }
-                        start_pos++;
-                        end_pos = start_pos+win_size;
-                    }
-                    win_size --;
-                }
-                if(win_size == 1){
-                    for (String sub : subwords) { // only do this for origin units
-                        c = nOfDocsWithWord.get(sub);
-                        if(c == null) {
-                            nOfDocsWithWord.put(sub, 1);
-                        }else{
-                            nOfDocsWithWord.put(sub, c+1);
-                        }
-                    }
-                }
+//                String[] subwords = w.split("_");
+//                Integer win_size = subwords.length-1;
+//                while(win_size>1){
+//                    Integer start_pos = 0;
+//                    Integer end_pos = start_pos+win_size;
+//                    while(end_pos<subwords.length){
+//                        String[] subphrase = Arrays.copyOfRange(subwords, start_pos, end_pos);
+//                        String sub_phrase = String.join("_",subphrase);
+//                        c=nOfDocsWithWord.get(sub_phrase);
+//                        if(c == null) {
+//                            nOfDocsWithWord.put(sub_phrase, 1);
+//                        }else{
+//                            nOfDocsWithWord.put(sub_phrase, c+1);
+//                        }
+//                        start_pos++;
+//                        end_pos = start_pos+win_size;
+//                    }
+//                    win_size --;
+//                }
+//                if(win_size == 1){
+//                    for (String sub : subwords) { // only do this for origin units
+//                        c = nOfDocsWithWord.get(sub);
+//                        if(c == null) {
+//                            nOfDocsWithWord.put(sub, 1);
+//                        }else{
+//                            nOfDocsWithWord.put(sub, c+1);
+//                        }
+//                    }
+//                }
                 //////// end of new part
             }
         }
@@ -100,7 +100,7 @@ public class TfIdfBuilderKeywords {
             HashMap<String, Double> wordCount = fOfWordsInDocuments.get(entry);
             tfidt.put(entry, row);
             for (String w : wordCount.keySet()) {
-                double val = wordCount.get(w)*idf.get(w); // do idf for documents do not do it again for query
+                double val = wordCount.get(w);//*idf.get(w); // do idf for documents do not do it again for query
                 row.put(w, val);
                 Double colLength = columnLengths.get(w);
                 if (colLength == null) {
@@ -135,9 +135,9 @@ public class TfIdfBuilderKeywords {
                 Double value = e.getValue(); // / columnLengths.get(e.getKey());
                 //value = (value-min_score)/(max_score-min_score);
                 //value = 0.5+0.5*value/max_score;
-                value = value/max_score;
+                //value = value/max_score;
                 value *= idf.get(e.getKey());
-                //e.setValue(value); // normalize each column already involve a kind of idf
+                e.setValue(value); // normalize each column already involve a kind of idf
                 length += e.getValue() * e.getValue();
             }
             documentLength.put(entry, Math.sqrt(length));

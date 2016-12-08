@@ -19,14 +19,14 @@ public class ExpandedKeywordsBuilder {
 
     public HashMap<String, List<RankedString>> buildExpKeywords(Collection<AztecEntry> entries, String outputPath) throws JWNLException, IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/main/data/keywords.data"));
-        HashMap<String, List<RankedString>> keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+        HashMap<String, LinkedList<RankedString>> keywords = (HashMap<String, LinkedList<RankedString>>) ois.readObject();
         HashMap<String, List<RankedString>> expendedKeywords = new HashMap<>();
         TextExpansion TE = new TextExpansion();
         for (AztecEntry entry : entries) {
             LinkedList<RankedString> l = new LinkedList<>();
             expendedKeywords.put(entry.getId(), l);
             if (entry.getDescription() != null && entry.getDescription().trim().length() > 0) {
-                List<RankedString> rankedToken = keywords.get(entry.getId());
+                LinkedList<RankedString> rankedToken = keywords.get(entry.getId());
                 List<RankedString> expendedToken = TE.docExpansion(rankedToken);
                 expendedKeywords.put(entry.getId(),expendedToken);
             }
@@ -42,7 +42,7 @@ public class ExpandedKeywordsBuilder {
     }
     public HashMap<String, List<RankedString>> buildExpKeywordsAbstract(Collection<AbsEntry> entries, String outputPath) throws JWNLException, IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/main/data/abskeywords.data"));
-        HashMap<String, List<RankedString>> keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+        HashMap<String, LinkedList<RankedString>> keywords = (HashMap<String, LinkedList<RankedString>>) ois.readObject();
         HashMap<String, List<RankedString>> expendedKeywords = new HashMap<>();
         TextExpansion TE = new TextExpansion();
         //Integer total_abs = keywords.size();
@@ -59,7 +59,7 @@ public class ExpandedKeywordsBuilder {
             LinkedList<RankedString> l = new LinkedList<>();
             expendedKeywords.put(entry.getId(), l);
             if (entry.getDescription() != null && entry.getDescription().trim().length() > 0) {
-                List<RankedString> rankedToken = keywords.get(entry.getId());
+                LinkedList<RankedString> rankedToken = keywords.get(entry.getId());
                 List<RankedString> expendedToken = TE.docExpansion(rankedToken);
                 expendedKeywords.put(entry.getId(),expendedToken);
             }
@@ -90,8 +90,8 @@ public class ExpandedKeywordsBuilder {
 //        HashMap<String, List<RankedString>> expkeywords;
 //        ExpandedKeywordsBuilder builder = new ExpandedKeywordsBuilder();
 //        expkeywords = builder.buildExpKeywords(entryArray, "src/main/data/expkeywords.data");
-        String infile = "src/main/data/absKeywords.data";
-        String outfile = "src/main/data/absExpkeywords.data";
+        String infile = "src/main/data/keywords.data";
+        String outfile = "src/main/data/expkeywords.data";
         ExpandedKeywordsBuilder EKB = new ExpandedKeywordsBuilder();
         //HashMap<String, List<RankedString>> res = EKB.buildExpKeywordsAbstract(infile,outfile);
     }

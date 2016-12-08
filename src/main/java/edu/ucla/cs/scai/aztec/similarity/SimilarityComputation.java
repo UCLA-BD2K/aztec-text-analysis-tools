@@ -565,7 +565,7 @@ public class SimilarityComputation {
     public void getMostSimilarEntriesForAllEntries() throws Exception{
         SimilarityComputation SC = new SimilarityComputation();
 //        String infile = "src/main/data/tfidfk.data";
-        String outfile = "src/main/data/simlarentry3.txt";
+        String outfile = "src/main/data/simlarentry_withdomain_v2.txt";
         PrintWriter outString = new PrintWriter(outfile);
 //        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(infile));
 //        documentLengthK = (HashMap<String, Double>) ois.readObject();

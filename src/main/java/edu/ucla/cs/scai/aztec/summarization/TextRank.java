@@ -25,6 +25,11 @@ public class TextRank {
     HashMap<Integer, HashSet<String>> sets = new HashMap<>();
     double[] rank;
     Integer[] ordered;
+    private WeightedEdgeGraph dependencyGraph(String sen) throws JWNLException, FileNotFoundException {
+        Tokenizer tokenizer = new Tokenizer();
+        WeightedEdgeGraph g = new WeightedEdgeGraph(1);
+        return g;
+    }
 
     private double similarity(int i, int j) {
         if (sets.get(i).size() > sets.get(j).size()) {

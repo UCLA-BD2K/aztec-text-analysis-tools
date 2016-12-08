@@ -5,10 +5,12 @@ import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
 import edu.ucla.cs.scai.aztec.summarization.ExpandedKeywordsBuilder;
 import edu.ucla.cs.scai.aztec.summarization.KeywordsBuilder;
 import edu.ucla.cs.scai.aztec.summarization.RankedString;
+import edu.ucla.cs.scai.aztec.similarity.TfIdfBuilder;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,24 +29,24 @@ public class CachedData {
     static HashMap<String, Double> idfK;
     static HashMap<String, AztecEntry> entryMap;
     static ArrayList<AztecEntry> entryArray;
-    static HashMap<String, List<RankedString>> keywords;
+    static HashMap<String, LinkedList<RankedString>> keywords;
     static HashMap<String, List<RankedString>> expkeywords;
 
-//    private static void loadTfidfData() throws Exception {
-//        System.out.println("TF/IDF path system property: " + System.getProperty("tfidf.path"));
-//        String tfidtPath = System.getProperty("tfidf.path", "src/main/data/tfidf.data");
-//        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath));
-//        documentLength = (HashMap<String, Double>) ois.readObject();
-//        tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
-//        idf = (HashMap<String, Double>) ois.readObject();
-//    }
-//
-//    private static void buildTfidfData() throws Exception {
-//        System.out.println("TF/IDF path system property: " + System.getProperty("tfidf.path"));
-//        String tfidtPath = System.getProperty("tfidf.path", "src/main/data/tfidf.data");
-//        TfIdfBuilder builder = new TfIdfBuilder();
-//        builder.buildTfIdfMatrix(entryArray, tfidtPath);
-//    }
+    private static void loadTfidfData() throws Exception {
+        System.out.println("TF/IDF load path system property: " + System.getProperty("tfidf.path"));
+        String tfidtPath = System.getProperty("tfidf.path", "src/main/data/tfidf.data");
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tfidtPath));
+        documentLength = (HashMap<String, Double>) ois.readObject();
+        tfidt = (HashMap<String, HashMap<String, Double>>) ois.readObject();
+        idf = (HashMap<String, Double>) ois.readObject();
+    }
+
+    private static void buildTfidfData() throws Exception {
+        System.out.println("TF/IDF  build path system property: " + System.getProperty("tfidf.path"));
+        String tfidtPath = System.getProperty("tfidf.path", "src/main/data/tfidf.data");
+        TfIdfBuilder builder = new TfIdfBuilder();
+        builder.buildTfIdfMatrix(entryArray, tfidtPath);
+    }
     
     private static void loadTfidfKData() throws Exception {
         System.out.println("Load TF/IDF on keywords path system property: " + System.getProperty("tfidfk.path"));
@@ -66,7 +68,7 @@ public class CachedData {
         System.out.println("Load Keywords path system property: " + System.getProperty("keywords.path"));
         String keywordsPath = System.getProperty("keywords.path", "src/main/data/keywords.data");
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(keywordsPath));
-        keywords = (HashMap<String, List<RankedString>>) ois.readObject();
+        keywords = (HashMap<String, LinkedList<RankedString>>) ois.readObject();
     }
 
     private static void buildKeywords() throws Exception {
@@ -102,18 +104,18 @@ public class CachedData {
             Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-//        try {
-//            loadTfidfData();
-//        } catch (Exception ex) {
-//            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
-//            //tfidf data failed, try to reconstruct it
-//            try {
-//                buildTfidfData();
-//                loadTfidfData();
-//            } catch (Exception ex2) {
-//                Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
-//            }
-//        }
+        try {
+            loadTfidfData();
+        } catch (Exception ex) {
+            Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex);
+            //tfidf data failed, try to reconstruct it
+            try {
+                buildTfidfData();
+                loadTfidfData();
+            } catch (Exception ex2) {
+                Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
+            }
+        }
         
         try {
             loadKeywords();
@@ -150,7 +152,7 @@ public class CachedData {
             } catch (Exception ex2) {
                 Logger.getLogger(CachedData.class.getName()).log(Level.SEVERE, null, ex2);
             }
-        }        
+        }
     }
 
     static HashMap<String, Double> getDocumentLength() {

@@ -295,4 +295,11 @@ public class Tokenizer {
         }
         return res;
     }
+    public static void main(String[] args) throws JWNLException, FileNotFoundException{
+        Tokenizer tk = new Tokenizer();
+        LinkedList<String>tklist = tk.tokenize("Proteomics data");
+        for(String s: tklist){
+            System.out.print(s+" ");
+        }
+    }
 }

@@ -9,7 +9,7 @@ public class WeightedEdgeGraph {
     double[][] weights;
     double[] outgoingWeights;
 
-    int n;
+    int n; // number of nodes
 
     public WeightedEdgeGraph(int n) {
         this.n = n;
@@ -19,7 +19,7 @@ public class WeightedEdgeGraph {
 
     public void setWeight(int i, int j, double w) {
         double diff = w - weights[i][j];
-        outgoingWeights[i] += diff;
+        outgoingWeights[i] += diff; // to calculate the total weight give by this node
         outgoingWeights[j] += diff;
         weights[i][j] = w;
         weights[j][i] = w;

@@ -1,6 +1,8 @@
 package edu.ucla.cs.scai.aztec.summarization;
 
+import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
 import edu.ucla.cs.scai.aztec.keyphrase.Tokenizer;
+import edu.ucla.cs.scai.aztec.textexpansion.TagExpansion;
 import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.AbsEntry;
@@ -26,17 +28,35 @@ public class KeywordsBuilder {
         textparser = new TextParser();
     }
 
-    public HashMap<String, List<RankedString>> buildKeywords(Collection<AztecEntry> entries, String outputPath) throws IOException {
+    public HashMap<String, LinkedList<RankedString>> buildKeywords(Collection<AztecEntry> entries, String outputPath) throws JWNLException,IOException {
 
-        HashMap<String, List<RankedString>> res = new HashMap<>();
+        HashMap<String, LinkedList<RankedString>> res = new HashMap<>();
+        TagExpansion TE = new TagExpansion();
         for (AztecEntry entry : entries) {
+            LinkedList<RankedString> tl = new LinkedList<>();
             LinkedList<RankedString> l = new LinkedList<>();
             res.put(entry.getId(), l);
+            //use tag to buid key words
             if (entry.getDescription() != null && entry.getDescription().trim().length() > 0 && entry.getTags() !=null) {
                 try {
-                    KeywordsRank kr = new KeywordsRank(entry.getDescription()+" "+String.join(". ",entry.getTags()), 10);
+                    KeywordsRank kr = new KeywordsRank(entry.getDescription().replace("-","_"), 10);
                     //KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
-                    l.addAll(kr.topRankedKeywords(20));
+                    tl.addAll(kr.topRankedKeywords(30));
+                    tl.addAll(TE.tagExpansion(entry.getTags()));
+                    HashMap<String,Double> key_score = new HashMap<>();
+                    for(RankedString rs:tl){ // merge the duplication
+                        Double score = key_score.get(rs.getString());
+                        if(score!=null){
+                            score = score+rs.getRank();
+                            key_score.put(rs.getString(),score);
+                        }
+                        else{
+                            key_score.put(rs.getString(),rs.getRank());
+                        }
+                    }
+                    for(String key:key_score.keySet()){
+                        l.add(new RankedString(key,key_score.get(key)));
+                    }
                     //System.out.println(entry.getDescription() + " -> " + l);
                 } catch (Exception ex) {
                     Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,6 +72,17 @@ public class KeywordsBuilder {
                     Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            // build without tags
+//            if (entry.getDescription() != null && entry.getDescription().trim().length() > 0) {
+//                try {
+//                    KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
+//                    //KeywordsRank kr = new KeywordsRank(entry.getDescription(), 10);
+//                    l.addAll(kr.topRankedKeywords(20));
+//                    //System.out.println(entry.getDescription() + " -> " + l);
+//                } catch (Exception ex) {
+//                    Logger.getLogger(KeywordsBuilder.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
         }
 
         System.out.println("Writing keywords to file " + outputPath);
@@ -110,10 +141,13 @@ public class KeywordsBuilder {
         return res;
     }
 
-    public static void main (String[] args)throws IOException, JWNLException{
-        String infile = "src/main/data/abstract_removeurl.txt";
-        String outfile = "src/main/data/absKeywords_0.9.data";
+    public static void main (String[] args)throws Exception{
+
+        String outfile = "src/main/data/keywords.data";
         KeywordsBuilder KB = new KeywordsBuilder();
-        //HashMap<String, List<RankedString>> res = KB.buildKeywordsAbstract(infile,outfile);
+        PrintWriter pw = new PrintWriter(new FileOutputStream("src/main/data/exptags.txt"));
+        String entriesPath = System.getProperty("entries.path", "src/main/data/solrResources.json");
+        ArrayList<AztecEntry> entryArray = new AztecEntryProviderFromJsonFile(entriesPath).load();
+        HashMap<String, LinkedList<RankedString>> res = KB.buildKeywords(entryArray,outfile);
     }
 }

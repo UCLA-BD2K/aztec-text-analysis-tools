@@ -217,7 +217,7 @@ public class TextParser{
         reader.close();
     }
     public TextParser() throws IOException{
-        this.loadData("src/main/data/phraseList_20.txt");
+        this.loadData("src/main/data/phraseList_Chi.txt");
     }
     public LinkedList<String> queryParser_old(String text) throws JWNLException, IOException{
         LinkedList<String> unitList = new LinkedList<>();
@@ -276,6 +276,7 @@ public class TextParser{
         Tokenizer token = new Tokenizer();
         //this.loadData(infile);
         LinkedList<String> words = token.tokenize(text);
+        //String[] words = text.split(" ");
         ArrayList<String> next_words = new ArrayList<>();
         String phrase;
         Integer win_size = max_phrase;
@@ -365,7 +366,7 @@ public class TextParser{
         return  unitList;
     }
     public static void main(String[] args) throws JWNLException, IOException{
-        String test = "X.org macros utilities.Tool Dependency Packages";
+        String test = "metabolomics database";
         TextParser TP = new TextParser();
         LinkedList<String> units = TP.docParser(test);
         System.out.print(units);

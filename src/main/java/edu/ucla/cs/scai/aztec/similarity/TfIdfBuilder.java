@@ -2,6 +2,9 @@ package edu.ucla.cs.scai.aztec.similarity;
 
 import edu.ucla.cs.scai.aztec.AztecEntry;
 import edu.ucla.cs.scai.aztec.AztecEntryProviderFromJsonFile;
+import edu.ucla.cs.scai.aztec.textexpansion.TagExpansion;
+import edu.ucla.cs.scai.aztec.textexpansion.TextParser;
+import edu.ucla.cs.scai.aztec.keyphrase.Tokenizer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class TfIdfBuilder {
         tokenizer = new Tokenizer();
     }
 
-    public void buildTfIdfMatrixOld(Collection<AztecEntry> entries, String outputPath) throws IOException {
+    public void buildTfIdfMatrixOld(Collection<AztecEntry> entries, String outputPath) throws IOException, JWNLException {
 
         HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> fOfWordsInDocuments = new HashMap<>();
@@ -83,29 +86,52 @@ public class TfIdfBuilder {
     //the value of td-ift is constructed using the "Best fully weighted system" - Salton and Buckley, 1988
     //tf-idf(i,j) =tf(i,j) * log N/n_j / sqrt(sum_k (tf(k,j) * log (N/n_j))^2) 
 
-    public void buildTfIdfMatrix(Collection<AztecEntry> entries, String outputPath) throws IOException {
+    public void buildTfIdfMatrix(Collection<AztecEntry> entries, String outputPath) throws IOException, JWNLException {
+        TextParser TP = new TextParser();
+        TagExpansion TE = new TagExpansion();
 
         HashMap<String, Integer> nOfDocsWithWord = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> fOfWordsInDocuments = new HashMap<>();
         for (AztecEntry entry : entries) {
-            LinkedList<String> tokens = tokenizer.tokenize(entry.getDescription());
-            HashMap<String, Integer> wordCount = new HashMap<>();
-            fOfWordsInDocuments.put(entry.getId(), wordCount);
-            for (String w : tokens) {
-                Integer c = wordCount.get(w);
-                if (c == null) {
-                    wordCount.put(w, 1);
-                } else {
-                    wordCount.put(w, c + 1);
+            if (entry.getDescription() != null) {
+                LinkedList<String> tokens = TP.docParser(entry.getDescription());
+                if (entry.getTags() != null) {
+                    Integer count = 0;
+                    for (String tag : entry.getTags()) {
+                        if (!tag.equals("")) {
+                            String[] error_tags = tag.split(";");
+                            if (error_tags.length > 1) {
+                                for (String etag : error_tags) {
+                                    String tk_tag = TE.tagSplit(etag);
+                                    tokens.add(tk_tag);
+                                    count += 1;
+                                }
+                            } else {
+                                String tk_tag = TE.tagSplit(tag);
+                                tokens.add(tk_tag);
+                                count += 1;
+                            }
+                        }
+                    }
                 }
-            }
+                HashMap<String, Integer> wordCount = new HashMap<>();
+                fOfWordsInDocuments.put(entry.getId(), wordCount);
+                for (String w : tokens) {
+                    Integer c = wordCount.get(w);
+                    if (c == null) {
+                        wordCount.put(w, 1);
+                    } else {
+                        wordCount.put(w, c + 1);
+                    }
+                }
 
-            for (String w : wordCount.keySet()) {
-                Integer c = nOfDocsWithWord.get(w);
-                if (c == null) {
-                    nOfDocsWithWord.put(w, 1);
-                } else {
-                    nOfDocsWithWord.put(w, c + 1);
+                for (String w : wordCount.keySet()) {
+                    Integer c = nOfDocsWithWord.get(w);
+                    if (c == null) {
+                        nOfDocsWithWord.put(w, 1);
+                    } else {
+                        nOfDocsWithWord.put(w, c + 1);
+                    }
                 }
             }
         }
@@ -146,7 +172,7 @@ public class TfIdfBuilder {
             HashMap<String, Double> row = tfidt.get(entry);
             double length = 0;
             for (Map.Entry<String, Double> e : row.entrySet()) {
-                e.setValue(e.getValue() / columnLengths.get(e.getKey()));
+                //e.setValue(e.getValue() / columnLengths.get(e.getKey()));
                 length += e.getValue() * e.getValue();
             }
             documentLength.put(entry, Math.sqrt(length));
