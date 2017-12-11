@@ -1,0 +1,29 @@
+Collapsed
+[nsubj(reads-2, Readseq-1), root(ROOT-0, reads-2), cc(reads-2, and-3), conj:and(reads-2, converts-4), dobj(reads-2, biosequences-5), case(selection-8, between-6), det(selection-8, a-7), nmod:between(biosequences-5, selection-8), case(formats-13, of-9), amod(formats-13, common-10), amod(formats-13, biological-11), compound(formats-13, sequence-12), nmod:of(selection-8, formats-13), case(EMBL-16, including-15), nmod:including(biosequences-5, EMBL-16), conj:and(EMBL-16, GenBank-18), cc(EMBL-16, and-19), compound(formats-22, fasta-20), compound(formats-22, sequence-21), conj:and(EMBL-16, formats-22)]
+[21, 15, 7, 1, 4, 18, 8, 9, 10, 19, 20, 5, 6, 0, 3, 14, 17, 2, 11, 12, 13, 16, 22]
+[format, EMBL, selection, read, biosequence, and, of, common, biological, fasta, sequence, between, a, Readseq, convert, include]
+[format, selection, common, biosequence, biological_sequence, include, convert, embl, genbank, read, fasta_sequence, readseq]
+
+CCprocessed
+[nsubj(reads-2, Readseq-1), nsubj(converts-4, Readseq-1), root(ROOT-0, reads-2), cc(reads-2, and-3), conj:and(reads-2, converts-4), dobj(reads-2, biosequences-5), case(selection-8, between-6), det(selection-8, a-7), nmod:between(biosequences-5, selection-8), case(formats-13, of-9), amod(formats-13, common-10), amod(formats-13, biological-11), compound(formats-13, sequence-12), nmod:of(selection-8, formats-13), case(EMBL-16, including-15), nmod:including(biosequences-5, EMBL-16), nmod:including(biosequences-5, GenBank-18), conj:and(EMBL-16, GenBank-18), cc(EMBL-16, and-19), compound(formats-22, fasta-20), compound(formats-22, sequence-21), nmod:including(biosequences-5, formats-22), conj:and(EMBL-16, formats-22)]
+[21, 15, 4, 7, 1, 0, 3, 18, 17, 5, 6, 8, 9, 10, 19, 20, 14, 2, 11, 12, 13, 16, 22]
+[format, EMBL, biosequence, selection, read, Readseq, convert, and, genbank, between, a, of, common, biological, fasta, sequence]
+[format, selection, common, biosequence, biological_sequence, include, convert, embl, genbank, read, fasta_sequence, readseq]
+\
+after phrase
+[nsubj(reads-2, Readseq-1), nsubj(converts-4, Readseq-1), root(ROOT-0, reads-2), cc(reads-2, and-3), conj:and(reads-2, converts-4), dobj(reads-2, biosequences-5), case(selection-8, between-6), det(selection-8, a-7), nmod:between(biosequences-5, selection-8), case(formats-12, of-9), amod(formats-12, common-10), compound(formats-12, biological_sequence-11), nmod:of(selection-8, formats-12), case(EMBL-15, including-14), nmod:including(biosequences-5, EMBL-15), nmod:including(biosequences-5, GenBank-17), conj:and(EMBL-15, GenBank-17), cc(EMBL-15, and-18), compound(formats-20, fasta_sequence-19), nmod:including(biosequences-5, formats-20), conj:and(EMBL-15, formats-20)]
+[19, 14, 4, 7, 1, 0, 3, 17, 16, 5, 6, 8, 9, 10, 18, 13, 2, 11, 12, 15, 20]
+[format, EMBL, biosequence, selection, read, Readseq, convert, and, genbank, between, a, of, common, biological_sequence, fasta_sequence, include]
+[format, selection, common, biosequence, biological-sequence, include, convert, embl, genbank, read, fasta-sequence, readseq]
+
+[nsubj(reads-2, Readseq-1), nsubj(converts-4, Readseq-1), root(ROOT-0, reads-2), cc(reads-2, and-3), conj:and(reads-2, converts-4), dobj(reads-2, biosequences-5), case(selection-8, between-6), det(selection-8, a-7), nmod:between(biosequences-5, selection-8), case(formats-12, of-9), amod(formats-12, common-10), compound(formats-12, biological_sequence-11), nmod:of(selection-8, formats-12), case(EMBL-15, including-14), nmod:including(biosequences-5, EMBL-15), nmod:including(biosequences-5, GenBank-17), conj:and(EMBL-15, GenBank-17), cc(EMBL-15, and-18), compound(formats-20, fasta_sequence-19), nmod:including(biosequences-5, formats-20), conj:and(EMBL-15, formats-20)]
+[0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.4815500098884799, 0.4815500098884799, 0.4815500098884799, 0.49137907083391646, 0.7713731262842869, 0.8350446596733394, 0.8350446596733394, 1.1148059970068263, 1.1652428454801285, 1.2045805575589557, 1.7967973984600547, 2.341081655363712]
+[19, 4, 7, 1, 14, 0, 3, 16, 6, 9, 10, 18, 2, 5, 8, 11, 12, 13, 15, 17, 20]
+[format, biosequence, selection, read, EMBL, Readseq, convert, genbank, a, common, biological_sequence, fasta_sequence, and, between, of, format]
+[format, selection, common, biosequence, biological-sequence, include, convert, embl, genbank, read, fasta-sequence, readseq]
+
+[nsubj(read-2, readseq-1), nsubj(convert-4, readseq-1), root(ROOT-0, read-2), cc(read-2, and-3), conj:and(read-2, convert-4), advmod(convert-4, biosequence-5), case(selection-8, between-6), det(selection-8, a-7), nmod:between(convert-4, selection-8), case(format-12, of-9), amod(format-12, common-10), compound(format-12, biological_sequence-11), nmod:of(selection-8, format-12), dep(convert-4, include-14), compound(format-20, embl-15), conj:and(embl-15, genbank-17), compound(format-20, genbank-17), cc(embl-15, and-18), conj:and(embl-15, fasta_sequence-19), compound(format-20, fasta_sequence-19), dobj(convert-4, format-20)]
+[0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.15000000000000002, 0.46834562440220845, 0.46834562440220845, 0.48286436962273394, 0.48286436962273394, 0.49680543133999333, 0.7917085649738644, 0.7917085649738644, 0.8398694219148678, 0.8398694219148678, 1.1414681792222663, 1.223189731391978, 2.350352703394328, 2.6226079928240855]
+[19, 3, 7, 14, 0, 1, 16, 18, 6, 4, 13, 9, 10, 2, 5, 8, 11, 12, 15, 17, 20]
+[format, convert, selection, embl, readseq, read, genbank, fasta_sequence, a, biosequence, include, common, biological_sequence, and, between, of]
+[format, selection, common, biosequence, biological_sequence, include, convert, embl, genbank, read, fasta_sequence, readseq]
